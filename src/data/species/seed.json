@@ -1,0 +1,606 @@
+{
+  "version": 1,
+  "locale_focus": "vi-VN",
+  "species": [
+    {
+      "id": "snake-plant",
+      "common_name": "Snake Plant",
+      "scientific_name": "Sansevieria trifasciata",
+      "family": "Asparagaceae",
+      "description": "Lưỡi hổ — extremely tolerant indoor plant, popular in Vietnamese homes for its feng shui association and air-purifying reputation.",
+      "image_url": null,
+      "difficulty": "easy",
+      "light_requirement": "low",
+      "toxicity": "toxic_to_pets",
+      "tags": ["vi_name:Lưỡi hổ", "indoor", "low-maintenance", "feng-shui"],
+      "care_defaults": {
+        "watering_interval_days": 14,
+        "fertilizing_interval_days": 60,
+        "misting_interval_days": 14,
+        "repotting_interval_days": 730,
+        "pruning_interval_days": 180,
+        "cleaning_interval_days": 30
+      }
+    },
+    {
+      "id": "zz-plant",
+      "common_name": "ZZ Plant",
+      "scientific_name": "Zamioculcas zamiifolia",
+      "family": "Araceae",
+      "description": "Kim tiền — \"money tree\" of Vietnamese offices and shops; thrives on neglect and low light.",
+      "image_url": null,
+      "difficulty": "easy",
+      "light_requirement": "low",
+      "toxicity": "toxic_to_pets",
+      "tags": ["vi_name:Kim tiền", "indoor", "low-maintenance", "feng-shui"],
+      "care_defaults": {
+        "watering_interval_days": 14,
+        "fertilizing_interval_days": 60,
+        "misting_interval_days": 14,
+        "repotting_interval_days": 730,
+        "pruning_interval_days": 180,
+        "cleaning_interval_days": 30
+      }
+    },
+    {
+      "id": "money-tree",
+      "common_name": "Money Tree",
+      "scientific_name": "Pachira aquatica",
+      "family": "Malvaceae",
+      "description": "Kim ngân — braided-trunk wealth plant, ubiquitous as a Vietnamese housewarming or shop-opening gift.",
+      "image_url": null,
+      "difficulty": "easy",
+      "light_requirement": "bright_indirect",
+      "toxicity": "non_toxic",
+      "tags": ["vi_name:Kim ngân", "indoor", "feng-shui"],
+      "care_defaults": {
+        "watering_interval_days": 7,
+        "fertilizing_interval_days": 30,
+        "misting_interval_days": 7,
+        "repotting_interval_days": 730,
+        "pruning_interval_days": 90,
+        "cleaning_interval_days": 30
+      }
+    },
+    {
+      "id": "pothos",
+      "common_name": "Golden Pothos",
+      "scientific_name": "Epipremnum aureum",
+      "family": "Araceae",
+      "description": "Trầu bà vàng — fast-growing trailing vine, sold in nearly every Vietnamese plant shop.",
+      "image_url": null,
+      "difficulty": "easy",
+      "light_requirement": "medium",
+      "toxicity": "toxic_to_pets",
+      "tags": ["vi_name:Trầu bà vàng", "indoor", "vine"],
+      "care_defaults": {
+        "watering_interval_days": 5,
+        "fertilizing_interval_days": 30,
+        "misting_interval_days": 5,
+        "repotting_interval_days": 365,
+        "pruning_interval_days": 60,
+        "cleaning_interval_days": 30
+      }
+    },
+    {
+      "id": "monstera",
+      "common_name": "Monstera",
+      "scientific_name": "Monstera deliciosa",
+      "family": "Araceae",
+      "description": "Trầu bà lá xẻ — split-leaf statement plant, well-suited to Vietnamese humidity.",
+      "image_url": null,
+      "difficulty": "moderate",
+      "light_requirement": "bright_indirect",
+      "toxicity": "toxic_to_pets",
+      "tags": ["vi_name:Trầu bà lá xẻ", "indoor", "tropical"],
+      "care_defaults": {
+        "watering_interval_days": 6,
+        "fertilizing_interval_days": 30,
+        "misting_interval_days": 4,
+        "repotting_interval_days": 730,
+        "pruning_interval_days": 90,
+        "cleaning_interval_days": 21
+      }
+    },
+    {
+      "id": "lucky-bamboo",
+      "common_name": "Lucky Bamboo",
+      "scientific_name": "Dracaena sanderiana",
+      "family": "Asparagaceae",
+      "description": "Phát tài — twisted-stem bamboo (not a true bamboo); a Tết and feng shui staple.",
+      "image_url": null,
+      "difficulty": "easy",
+      "light_requirement": "medium",
+      "toxicity": "toxic_to_pets",
+      "tags": ["vi_name:Phát tài", "indoor", "feng-shui"],
+      "care_defaults": {
+        "watering_interval_days": 7,
+        "fertilizing_interval_days": 60,
+        "misting_interval_days": 7,
+        "repotting_interval_days": 730,
+        "pruning_interval_days": 180,
+        "cleaning_interval_days": 30
+      }
+    },
+    {
+      "id": "areca-palm",
+      "common_name": "Areca Palm",
+      "scientific_name": "Dypsis lutescens",
+      "family": "Arecaceae",
+      "description": "Cau vàng / Cau cảnh — feathery indoor palm common in Vietnamese homes and offices.",
+      "image_url": null,
+      "difficulty": "moderate",
+      "light_requirement": "bright_indirect",
+      "toxicity": "non_toxic",
+      "tags": ["vi_name:Cau vàng", "indoor", "palm"],
+      "care_defaults": {
+        "watering_interval_days": 4,
+        "fertilizing_interval_days": 30,
+        "misting_interval_days": 3,
+        "repotting_interval_days": 730,
+        "pruning_interval_days": 90,
+        "cleaning_interval_days": 21
+      }
+    },
+    {
+      "id": "peace-lily",
+      "common_name": "Peace Lily",
+      "scientific_name": "Spathiphyllum wallisii",
+      "family": "Araceae",
+      "description": "Lan ý / Bạch môn — white-bract flowering houseplant; tells you when it's thirsty by drooping.",
+      "image_url": null,
+      "difficulty": "easy",
+      "light_requirement": "medium",
+      "toxicity": "toxic_to_pets",
+      "tags": ["vi_name:Lan ý", "indoor", "flowering"],
+      "care_defaults": {
+        "watering_interval_days": 4,
+        "fertilizing_interval_days": 30,
+        "misting_interval_days": 3,
+        "repotting_interval_days": 365,
+        "pruning_interval_days": 60,
+        "cleaning_interval_days": 21
+      }
+    },
+    {
+      "id": "rubber-plant",
+      "common_name": "Rubber Plant",
+      "scientific_name": "Ficus elastica",
+      "family": "Moraceae",
+      "description": "Đa búp đỏ / Cao su Ấn — glossy-leaved indoor tree.",
+      "image_url": null,
+      "difficulty": "easy",
+      "light_requirement": "bright_indirect",
+      "toxicity": "toxic_to_pets",
+      "tags": ["vi_name:Đa búp đỏ", "indoor", "tree"],
+      "care_defaults": {
+        "watering_interval_days": 7,
+        "fertilizing_interval_days": 30,
+        "misting_interval_days": 7,
+        "repotting_interval_days": 730,
+        "pruning_interval_days": 90,
+        "cleaning_interval_days": 21
+      }
+    },
+    {
+      "id": "fiddle-leaf-fig",
+      "common_name": "Fiddle Leaf Fig",
+      "scientific_name": "Ficus lyrata",
+      "family": "Moraceae",
+      "description": "Bàng Singapore — large violin-shaped leaves; loves bright Vietnamese light but hates being moved.",
+      "image_url": null,
+      "difficulty": "moderate",
+      "light_requirement": "bright_indirect",
+      "toxicity": "toxic_to_pets",
+      "tags": ["vi_name:Bàng Singapore", "indoor", "tree"],
+      "care_defaults": {
+        "watering_interval_days": 6,
+        "fertilizing_interval_days": 30,
+        "misting_interval_days": 5,
+        "repotting_interval_days": 730,
+        "pruning_interval_days": 90,
+        "cleaning_interval_days": 14
+      }
+    },
+    {
+      "id": "birds-nest-fern",
+      "common_name": "Bird's Nest Fern",
+      "scientific_name": "Asplenium nidus",
+      "family": "Aspleniaceae",
+      "description": "Ráng ổ phụng — bright green wavy fronds; thrives in Vietnam's humidity.",
+      "image_url": null,
+      "difficulty": "moderate",
+      "light_requirement": "medium",
+      "toxicity": "non_toxic",
+      "tags": ["vi_name:Ráng ổ phụng", "indoor", "fern", "humidity-loving"],
+      "care_defaults": {
+        "watering_interval_days": 4,
+        "fertilizing_interval_days": 30,
+        "misting_interval_days": 2,
+        "repotting_interval_days": 730,
+        "pruning_interval_days": 90,
+        "cleaning_interval_days": 30
+      }
+    },
+    {
+      "id": "frangipani",
+      "common_name": "Frangipani",
+      "scientific_name": "Plumeria rubra",
+      "family": "Apocynaceae",
+      "description": "Hoa sứ / Đại — fragrant pinwheel flowers; common in Vietnamese gardens, pagodas, and along streets.",
+      "image_url": null,
+      "difficulty": "moderate",
+      "light_requirement": "direct",
+      "toxicity": "toxic_to_pets",
+      "tags": ["vi_name:Hoa sứ", "outdoor", "flowering", "tropical"],
+      "care_defaults": {
+        "watering_interval_days": 7,
+        "fertilizing_interval_days": 21,
+        "misting_interval_days": 14,
+        "repotting_interval_days": 730,
+        "pruning_interval_days": 60,
+        "cleaning_interval_days": 60
+      }
+    },
+    {
+      "id": "hibiscus",
+      "common_name": "Chinese Hibiscus",
+      "scientific_name": "Hibiscus rosa-sinensis",
+      "family": "Malvaceae",
+      "description": "Dâm bụt / Bông bụp — large red trumpet flowers; classic Vietnamese hedge plant.",
+      "image_url": null,
+      "difficulty": "easy",
+      "light_requirement": "direct",
+      "toxicity": "non_toxic",
+      "tags": ["vi_name:Dâm bụt", "outdoor", "flowering"],
+      "care_defaults": {
+        "watering_interval_days": 3,
+        "fertilizing_interval_days": 14,
+        "misting_interval_days": 7,
+        "repotting_interval_days": 365,
+        "pruning_interval_days": 45,
+        "cleaning_interval_days": 60
+      }
+    },
+    {
+      "id": "bougainvillea",
+      "common_name": "Bougainvillea",
+      "scientific_name": "Bougainvillea glabra",
+      "family": "Nyctaginaceae",
+      "description": "Hoa giấy — papery magenta or orange bracts; cascades over Vietnamese balconies and walls.",
+      "image_url": null,
+      "difficulty": "moderate",
+      "light_requirement": "direct",
+      "toxicity": "non_toxic",
+      "tags": ["vi_name:Hoa giấy", "outdoor", "flowering", "vine"],
+      "care_defaults": {
+        "watering_interval_days": 5,
+        "fertilizing_interval_days": 21,
+        "misting_interval_days": 14,
+        "repotting_interval_days": 730,
+        "pruning_interval_days": 60,
+        "cleaning_interval_days": 60
+      }
+    },
+    {
+      "id": "jasmine-sambac",
+      "common_name": "Arabian Jasmine",
+      "scientific_name": "Jasminum sambac",
+      "family": "Oleaceae",
+      "description": "Hoa lài / Nhài — small fragrant white flowers used in Vietnamese tea.",
+      "image_url": null,
+      "difficulty": "moderate",
+      "light_requirement": "bright_indirect",
+      "toxicity": "non_toxic",
+      "tags": ["vi_name:Hoa lài", "outdoor", "flowering", "fragrant"],
+      "care_defaults": {
+        "watering_interval_days": 3,
+        "fertilizing_interval_days": 21,
+        "misting_interval_days": 7,
+        "repotting_interval_days": 365,
+        "pruning_interval_days": 45,
+        "cleaning_interval_days": 60
+      }
+    },
+    {
+      "id": "phalaenopsis",
+      "common_name": "Phalaenopsis Orchid",
+      "scientific_name": "Phalaenopsis sp.",
+      "family": "Orchidaceae",
+      "description": "Lan hồ điệp — moth orchid, the most popular gift orchid in Vietnam, especially around Tết.",
+      "image_url": null,
+      "difficulty": "moderate",
+      "light_requirement": "bright_indirect",
+      "toxicity": "non_toxic",
+      "tags": ["vi_name:Lan hồ điệp", "indoor", "flowering", "orchid"],
+      "care_defaults": {
+        "watering_interval_days": 7,
+        "fertilizing_interval_days": 14,
+        "misting_interval_days": 3,
+        "repotting_interval_days": 730,
+        "pruning_interval_days": 365,
+        "cleaning_interval_days": 30
+      }
+    },
+    {
+      "id": "dendrobium",
+      "common_name": "Dendrobium Orchid",
+      "scientific_name": "Dendrobium sp.",
+      "family": "Orchidaceae",
+      "description": "Lan dendro — cane-stem orchids, widely cultivated outdoors in southern Vietnam.",
+      "image_url": null,
+      "difficulty": "moderate",
+      "light_requirement": "bright_indirect",
+      "toxicity": "non_toxic",
+      "tags": ["vi_name:Lan dendro", "outdoor", "flowering", "orchid"],
+      "care_defaults": {
+        "watering_interval_days": 5,
+        "fertilizing_interval_days": 14,
+        "misting_interval_days": 3,
+        "repotting_interval_days": 730,
+        "pruning_interval_days": 180,
+        "cleaning_interval_days": 30
+      }
+    },
+    {
+      "id": "kumquat",
+      "common_name": "Kumquat",
+      "scientific_name": "Citrus japonica",
+      "family": "Rutaceae",
+      "description": "Cây quất / Tắc — orange-fruited Tết tree symbolising prosperity; central to Vietnamese New Year.",
+      "image_url": null,
+      "difficulty": "moderate",
+      "light_requirement": "direct",
+      "toxicity": "non_toxic",
+      "tags": ["vi_name:Quất", "outdoor", "fruiting", "tet"],
+      "care_defaults": {
+        "watering_interval_days": 3,
+        "fertilizing_interval_days": 21,
+        "misting_interval_days": 7,
+        "repotting_interval_days": 365,
+        "pruning_interval_days": 60,
+        "cleaning_interval_days": 60
+      }
+    },
+    {
+      "id": "mai-vang",
+      "common_name": "Vietnamese Apricot",
+      "scientific_name": "Ochna integerrima",
+      "family": "Ochnaceae",
+      "description": "Mai vàng — yellow Tết flower of southern Vietnam; loses leaves before flowering.",
+      "image_url": null,
+      "difficulty": "hard",
+      "light_requirement": "direct",
+      "toxicity": "non_toxic",
+      "tags": ["vi_name:Mai vàng", "outdoor", "flowering", "tet"],
+      "care_defaults": {
+        "watering_interval_days": 4,
+        "fertilizing_interval_days": 21,
+        "misting_interval_days": 14,
+        "repotting_interval_days": 365,
+        "pruning_interval_days": 60,
+        "cleaning_interval_days": 60
+      }
+    },
+    {
+      "id": "peach-blossom",
+      "common_name": "Peach Blossom",
+      "scientific_name": "Prunus persica",
+      "family": "Rosaceae",
+      "description": "Đào — pink Tết flower of northern Vietnam (Hanoi, Nhật Tân); needs cool winter to bloom.",
+      "image_url": null,
+      "difficulty": "hard",
+      "light_requirement": "direct",
+      "toxicity": "toxic_to_pets",
+      "tags": ["vi_name:Đào", "outdoor", "flowering", "tet"],
+      "care_defaults": {
+        "watering_interval_days": 3,
+        "fertilizing_interval_days": 21,
+        "misting_interval_days": 14,
+        "repotting_interval_days": 365,
+        "pruning_interval_days": 60,
+        "cleaning_interval_days": 60
+      }
+    },
+    {
+      "id": "lemongrass",
+      "common_name": "Lemongrass",
+      "scientific_name": "Cymbopogon citratus",
+      "family": "Poaceae",
+      "description": "Sả — essential Vietnamese cooking herb; clumping grass for sun-drenched balconies.",
+      "image_url": null,
+      "difficulty": "easy",
+      "light_requirement": "direct",
+      "toxicity": "non_toxic",
+      "tags": ["vi_name:Sả", "outdoor", "edible", "herb"],
+      "care_defaults": {
+        "watering_interval_days": 3,
+        "fertilizing_interval_days": 30,
+        "misting_interval_days": 14,
+        "repotting_interval_days": 365,
+        "pruning_interval_days": 60,
+        "cleaning_interval_days": 90
+      }
+    },
+    {
+      "id": "thai-basil",
+      "common_name": "Thai Basil",
+      "scientific_name": "Ocimum basilicum var. thyrsiflora",
+      "family": "Lamiaceae",
+      "description": "Húng quế — anise-scented basil for phở and gỏi cuốn; pinch flower buds to extend the harvest.",
+      "image_url": null,
+      "difficulty": "easy",
+      "light_requirement": "bright_indirect",
+      "toxicity": "non_toxic",
+      "tags": ["vi_name:Húng quế", "edible", "herb"],
+      "care_defaults": {
+        "watering_interval_days": 2,
+        "fertilizing_interval_days": 21,
+        "misting_interval_days": 7,
+        "repotting_interval_days": 180,
+        "pruning_interval_days": 14,
+        "cleaning_interval_days": 90
+      }
+    },
+    {
+      "id": "vietnamese-coriander",
+      "common_name": "Vietnamese Coriander",
+      "scientific_name": "Persicaria odorata",
+      "family": "Polygonaceae",
+      "description": "Rau răm — peppery herb for hột vịt lộn and gỏi; spreads readily in moist pots.",
+      "image_url": null,
+      "difficulty": "easy",
+      "light_requirement": "bright_indirect",
+      "toxicity": "non_toxic",
+      "tags": ["vi_name:Rau răm", "edible", "herb"],
+      "care_defaults": {
+        "watering_interval_days": 2,
+        "fertilizing_interval_days": 30,
+        "misting_interval_days": 5,
+        "repotting_interval_days": 180,
+        "pruning_interval_days": 21,
+        "cleaning_interval_days": 90
+      }
+    },
+    {
+      "id": "perilla",
+      "common_name": "Perilla",
+      "scientific_name": "Perilla frutescens",
+      "family": "Lamiaceae",
+      "description": "Tía tô — purple-backed leaves used in Vietnamese herb plates and broths.",
+      "image_url": null,
+      "difficulty": "easy",
+      "light_requirement": "bright_indirect",
+      "toxicity": "non_toxic",
+      "tags": ["vi_name:Tía tô", "edible", "herb"],
+      "care_defaults": {
+        "watering_interval_days": 2,
+        "fertilizing_interval_days": 21,
+        "misting_interval_days": 7,
+        "repotting_interval_days": 180,
+        "pruning_interval_days": 21,
+        "cleaning_interval_days": 90
+      }
+    },
+    {
+      "id": "vietnamese-mint",
+      "common_name": "Vietnamese Mint",
+      "scientific_name": "Mentha arvensis",
+      "family": "Lamiaceae",
+      "description": "Húng lủi — mint for spring rolls and bún; vigorous, give it its own pot.",
+      "image_url": null,
+      "difficulty": "easy",
+      "light_requirement": "bright_indirect",
+      "toxicity": "non_toxic",
+      "tags": ["vi_name:Húng lủi", "edible", "herb"],
+      "care_defaults": {
+        "watering_interval_days": 2,
+        "fertilizing_interval_days": 30,
+        "misting_interval_days": 7,
+        "repotting_interval_days": 180,
+        "pruning_interval_days": 21,
+        "cleaning_interval_days": 90
+      }
+    },
+    {
+      "id": "pandan",
+      "common_name": "Pandan",
+      "scientific_name": "Pandanus amaryllifolius",
+      "family": "Pandanaceae",
+      "description": "Lá dứa — sweet-grassy aromatic leaves used in chè, xôi and Vietnamese desserts.",
+      "image_url": null,
+      "difficulty": "easy",
+      "light_requirement": "bright_indirect",
+      "toxicity": "non_toxic",
+      "tags": ["vi_name:Lá dứa", "outdoor", "edible", "herb"],
+      "care_defaults": {
+        "watering_interval_days": 4,
+        "fertilizing_interval_days": 30,
+        "misting_interval_days": 5,
+        "repotting_interval_days": 365,
+        "pruning_interval_days": 90,
+        "cleaning_interval_days": 90
+      }
+    },
+    {
+      "id": "culantro",
+      "common_name": "Culantro",
+      "scientific_name": "Eryngium foetidum",
+      "family": "Apiaceae",
+      "description": "Ngò gai / Mùi tàu — long serrated leaves with strong coriander aroma; stronger flavour than regular coriander.",
+      "image_url": null,
+      "difficulty": "easy",
+      "light_requirement": "medium",
+      "toxicity": "non_toxic",
+      "tags": ["vi_name:Ngò gai", "edible", "herb"],
+      "care_defaults": {
+        "watering_interval_days": 2,
+        "fertilizing_interval_days": 30,
+        "misting_interval_days": 7,
+        "repotting_interval_days": 180,
+        "pruning_interval_days": 30,
+        "cleaning_interval_days": 90
+      }
+    },
+    {
+      "id": "birds-eye-chili",
+      "common_name": "Bird's Eye Chili",
+      "scientific_name": "Capsicum frutescens",
+      "family": "Solanaceae",
+      "description": "Ớt hiểm — small, fiery red chilies used everywhere in Vietnamese cooking.",
+      "image_url": null,
+      "difficulty": "easy",
+      "light_requirement": "direct",
+      "toxicity": "non_toxic",
+      "tags": ["vi_name:Ớt hiểm", "outdoor", "edible", "fruiting"],
+      "care_defaults": {
+        "watering_interval_days": 3,
+        "fertilizing_interval_days": 21,
+        "misting_interval_days": 14,
+        "repotting_interval_days": 365,
+        "pruning_interval_days": 60,
+        "cleaning_interval_days": 90
+      }
+    },
+    {
+      "id": "aloe-vera",
+      "common_name": "Aloe Vera",
+      "scientific_name": "Aloe barbadensis miller",
+      "family": "Asphodelaceae",
+      "description": "Nha đam / Lô hội — succulent grown in Vietnam for skincare and chè nha đam dessert.",
+      "image_url": null,
+      "difficulty": "easy",
+      "light_requirement": "direct",
+      "toxicity": "toxic_to_pets",
+      "tags": ["vi_name:Nha đam", "outdoor", "succulent", "edible"],
+      "care_defaults": {
+        "watering_interval_days": 14,
+        "fertilizing_interval_days": 60,
+        "misting_interval_days": 30,
+        "repotting_interval_days": 730,
+        "pruning_interval_days": 180,
+        "cleaning_interval_days": 60
+      }
+    },
+    {
+      "id": "jade-plant",
+      "common_name": "Jade Plant",
+      "scientific_name": "Crassula ovata",
+      "family": "Crassulaceae",
+      "description": "Cây ngọc bích — coin-leaf succulent considered lucky in Vietnamese tradition.",
+      "image_url": null,
+      "difficulty": "easy",
+      "light_requirement": "direct",
+      "toxicity": "toxic_to_pets",
+      "tags": ["vi_name:Ngọc bích", "indoor", "succulent", "feng-shui"],
+      "care_defaults": {
+        "watering_interval_days": 14,
+        "fertilizing_interval_days": 60,
+        "misting_interval_days": 30,
+        "repotting_interval_days": 730,
+        "pruning_interval_days": 180,
+        "cleaning_interval_days": 60
+      }
+    }
+  ]
+}
