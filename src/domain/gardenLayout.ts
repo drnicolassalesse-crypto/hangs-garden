@@ -53,20 +53,43 @@ const AREA_COLORS = ['#52B788', '#74C69D', '#40916C', '#2D6A4F', '#95D5B2'];
 
 let colorIndex = 0;
 
+/** Pixels per centimeter on the canvas (1 cm ≈ 2px). */
+export const PX_PER_CM = 2;
+
 export function createDefaultArea(
   template: AreaShapeTemplate,
   newId: () => UUID,
+  options?: { label?: string; widthCm?: number; heightCm?: number },
 ): GardenArea {
   const color = AREA_COLORS[colorIndex % AREA_COLORS.length];
   colorIndex++;
+
+  const base = TEMPLATE_POINTS[template];
+  let points = base.map((p) => ({ ...p }));
+
+  // Scale to real dimensions if provided
+  if (options?.widthCm && options?.heightCm) {
+    const baseXs = base.map((p) => p.x);
+    const baseYs = base.map((p) => p.y);
+    const baseW = Math.max(...baseXs) - Math.min(...baseXs);
+    const baseH = Math.max(...baseYs) - Math.min(...baseYs);
+    const targetW = options.widthCm * PX_PER_CM;
+    const targetH = options.heightCm * PX_PER_CM;
+    const sx = baseW > 0 ? targetW / baseW : 1;
+    const sy = baseH > 0 ? targetH / baseH : 1;
+    points = base.map((p) => ({ x: p.x * sx, y: p.y * sy }));
+  }
+
   return {
     id: newId(),
     template,
-    points: TEMPLATE_POINTS[template].map((p) => ({ ...p })),
-    label: '',
+    points,
+    label: options?.label ?? '',
     fill_color: color,
     x: 50,
     y: 50,
+    width_cm: options?.widthCm ?? null,
+    height_cm: options?.heightCm ?? null,
   };
 }
 

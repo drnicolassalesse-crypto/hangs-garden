@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { Group, Line, Circle, Text } from 'react-konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { GardenArea, LayoutPoint } from '../../domain/types';
@@ -12,7 +13,7 @@ interface AreaShapeProps {
   onSelect: () => void;
 }
 
-const HANDLE_RADIUS = 8;
+const HANDLE_RADIUS = 12; // bigger for easier finger targeting
 
 export function AreaShape({
   area,
@@ -24,14 +25,32 @@ export function AreaShape({
 }: AreaShapeProps) {
   const flatPts = flattenPoints(area.points);
   const centroid = polygonCentroid(area.points);
+  const draggingHandle = useRef(false);
+
+  // Compute dimension label from bounding box
+  const xs = area.points.map((p) => p.x);
+  const ys = area.points.map((p) => p.y);
+  const bboxW = Math.round(Math.max(...xs) - Math.min(...xs));
+  const bboxH = Math.round(Math.max(...ys) - Math.min(...ys));
+  const dimLabel = area.width_cm && area.height_cm
+    ? `${area.width_cm} × ${area.height_cm} cm`
+    : `${bboxW} × ${bboxH}`;
 
   return (
     <Group
       x={area.x}
       y={area.y}
-      draggable={isEditable}
+      draggable={isEditable && !draggingHandle.current}
+      onDragStart={(e: KonvaEventObject<DragEvent>) => {
+        // Don't let the group drag when a handle is being dragged
+        if (draggingHandle.current) {
+          e.target.stopDrag();
+        }
+      }}
       onDragEnd={(e: KonvaEventObject<DragEvent>) => {
-        onDragEnd(e.target.x(), e.target.y());
+        if (!draggingHandle.current) {
+          onDragEnd(e.target.x(), e.target.y());
+        }
       }}
       onClick={isEditable ? onSelect : undefined}
       onTap={isEditable ? onSelect : undefined}
@@ -46,15 +65,41 @@ export function AreaShape({
       />
 
       {/* Label */}
-      {area.label && (
+      {area.label ? (
+        <>
+          <Text
+            x={centroid.x - 60}
+            y={centroid.y - 16}
+            width={120}
+            text={area.label}
+            fontSize={14}
+            fontStyle="bold"
+            fontFamily="Inter, system-ui, sans-serif"
+            fill="#1B1B1B"
+            align="center"
+            listening={false}
+          />
+          <Text
+            x={centroid.x - 60}
+            y={centroid.y + 2}
+            width={120}
+            text={dimLabel}
+            fontSize={10}
+            fontFamily="Inter, system-ui, sans-serif"
+            fill="#6B7280"
+            align="center"
+            listening={false}
+          />
+        </>
+      ) : (
         <Text
-          x={centroid.x - 50}
-          y={centroid.y - 8}
-          width={100}
-          text={area.label}
-          fontSize={14}
+          x={centroid.x - 60}
+          y={centroid.y - 6}
+          width={120}
+          text={dimLabel}
+          fontSize={11}
           fontFamily="Inter, system-ui, sans-serif"
-          fill="#1B1B1B"
+          fill="#6B7280"
           align="center"
           listening={false}
         />
@@ -71,15 +116,21 @@ export function AreaShape({
             radius={HANDLE_RADIUS}
             fill="white"
             stroke={area.fill_color}
-            strokeWidth={2}
+            strokeWidth={2.5}
             draggable
-            onDragMove={(e: KonvaEventObject<DragEvent>) => {
-              // Live preview: update position as user drags
-              const node = e.target;
-              onPointDragEnd(idx, { x: node.x(), y: node.y() });
+            onDragStart={() => {
+              draggingHandle.current = true;
             }}
             onDragEnd={(e: KonvaEventObject<DragEvent>) => {
+              e.cancelBubble = true;
               onPointDragEnd(idx, { x: e.target.x(), y: e.target.y() });
+              draggingHandle.current = false;
+            }}
+            onMouseDown={(e: KonvaEventObject<MouseEvent>) => {
+              e.cancelBubble = true;
+            }}
+            onTouchStart={(e: KonvaEventObject<TouchEvent>) => {
+              e.cancelBubble = true;
             }}
           />
         ))}

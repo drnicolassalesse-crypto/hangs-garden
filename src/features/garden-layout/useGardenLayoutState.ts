@@ -85,9 +85,17 @@ export function useGardenLayoutState(
 
   // ── Area actions ──────────────────────────────────────
   const handleAddArea = useCallback(
-    (template: AreaShapeTemplate, label: string) => {
-      const area = createDefaultArea(template, newId);
-      area.label = label;
+    (
+      template: AreaShapeTemplate,
+      label: string,
+      widthCm?: number,
+      heightCm?: number,
+    ) => {
+      const area = createDefaultArea(template, newId, {
+        label,
+        widthCm,
+        heightCm,
+      });
       update(addArea(layout, area));
       setSelectedId(area.id);
     },

@@ -500,6 +500,10 @@ const en: Record<string, string> = {
   'gardenLayout.shapePicker.uShape': 'U-shape',
   'gardenLayout.shapePicker.uShape.desc': 'U-shaped area or wraparound.',
   'gardenLayout.shapePicker.labelPlaceholder': 'e.g. Main balcony',
+  'gardenLayout.shapePicker.dimensions': 'Real dimensions (optional)',
+  'gardenLayout.shapePicker.width': 'Width',
+  'gardenLayout.shapePicker.height': 'Depth',
+  'gardenLayout.shapePicker.dimensionsHint': 'Enter real measurements to position pots to scale.',
 
   // Plant palette
   'gardenLayout.palette.heading': 'Place plants',

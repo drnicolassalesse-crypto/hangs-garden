@@ -15,14 +15,19 @@ const SIZES: { value: PotSize; labelKey: string; hintKey: string }[] = [
   { value: 'xl', labelKey: 'addPlant.pot.sizeXL', hintKey: 'addPlant.pot.sizeXL.hint' },
 ];
 
-const MATERIALS: { value: PotMaterial; labelKey: string; emoji: string }[] = [
-  { value: 'plastic', labelKey: 'addPlant.pot.plastic', emoji: '🧴' },
-  { value: 'terracotta', labelKey: 'addPlant.pot.terracotta', emoji: '🏺' },
-  { value: 'ceramic', labelKey: 'addPlant.pot.ceramic', emoji: '🍶' },
-  { value: 'fabric', labelKey: 'addPlant.pot.fabric', emoji: '🧺' },
-  { value: 'glass', labelKey: 'addPlant.pot.glass', emoji: '🥃' },
-  { value: 'metal', labelKey: 'addPlant.pot.metal', emoji: '🪣' },
-  { value: 'wood', labelKey: 'addPlant.pot.wood', emoji: '🪵' },
+const MATERIALS: {
+  value: PotMaterial;
+  labelKey: string;
+  color: string;
+  icon: string;
+}[] = [
+  { value: 'plastic', labelKey: 'addPlant.pot.plastic', color: '#94A3B8', icon: '\u{1FAB4}' },
+  { value: 'terracotta', labelKey: 'addPlant.pot.terracotta', color: '#C2714F', icon: '\u{1FAB4}' },
+  { value: 'ceramic', labelKey: 'addPlant.pot.ceramic', color: '#F0EDE8', icon: '\u{1FAB4}' },
+  { value: 'fabric', labelKey: 'addPlant.pot.fabric', color: '#8B7355', icon: '\u{1FAB4}' },
+  { value: 'glass', labelKey: 'addPlant.pot.glass', color: '#BFDBFE', icon: '\u{1FAB4}' },
+  { value: 'metal', labelKey: 'addPlant.pot.metal', color: '#9CA3AF', icon: '\u{1FAB4}' },
+  { value: 'wood', labelKey: 'addPlant.pot.wood', color: '#A0845C', icon: '\u{1FAB4}' },
 ];
 
 const SOILS: { value: SoilType; labelKey: string }[] = [
@@ -69,7 +74,12 @@ export function StepPotDetails({
               selected={draft.pot_material === m.value}
               onClick={() => onChange({ pot_material: m.value })}
             >
-              <div className="text-xl">{m.emoji}</div>
+              <div
+                className="flex h-8 w-8 items-center justify-center rounded-full text-sm"
+                style={{ backgroundColor: m.color }}
+              >
+                {m.icon}
+              </div>
               <div className="text-xs">{t(m.labelKey)}</div>
             </Pill>
           ))}

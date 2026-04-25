@@ -4,7 +4,12 @@ import { t } from '../../i18n';
 import { TextInput } from '../../ui/Field';
 
 interface AreaShapePickerProps {
-  onPick: (template: AreaShapeTemplate, label: string) => void;
+  onPick: (
+    template: AreaShapeTemplate,
+    label: string,
+    widthCm: number | undefined,
+    heightCm: number | undefined,
+  ) => void;
   onClose: () => void;
 }
 
@@ -18,29 +23,38 @@ const TEMPLATES: {
     type: 'rectangle',
     labelKey: 'gardenLayout.shapePicker.rectangle',
     descKey: 'gardenLayout.shapePicker.rectangle.desc',
-    preview: '▬',
+    preview: '\u25AC',
   },
   {
     type: 'l_shape',
     labelKey: 'gardenLayout.shapePicker.lShape',
     descKey: 'gardenLayout.shapePicker.lShape.desc',
-    preview: '⌐',
+    preview: '\u231E',
   },
   {
     type: 'u_shape',
     labelKey: 'gardenLayout.shapePicker.uShape',
     descKey: 'gardenLayout.shapePicker.uShape.desc',
-    preview: '⊔',
+    preview: '\u2294',
   },
 ];
 
 export function AreaShapePicker({ onPick, onClose }: AreaShapePickerProps) {
   const [selected, setSelected] = useState<AreaShapeTemplate | null>(null);
   const [label, setLabel] = useState('');
+  const [widthStr, setWidthStr] = useState('');
+  const [heightStr, setHeightStr] = useState('');
 
   function handleConfirm() {
     if (!selected) return;
-    onPick(selected, label.trim());
+    const w = parseFloat(widthStr);
+    const h = parseFloat(heightStr);
+    onPick(
+      selected,
+      label.trim(),
+      w > 0 ? w : undefined,
+      h > 0 ? h : undefined,
+    );
     onClose();
   }
 
@@ -48,7 +62,7 @@ export function AreaShapePicker({ onPick, onClose }: AreaShapePickerProps) {
     <div className="fixed inset-0 z-40 flex items-end" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40" />
       <div
-        className="relative w-full rounded-t-3xl bg-card p-4 pb-8"
+        className="relative max-h-[85vh] w-full overflow-y-auto rounded-t-3xl bg-card p-4 pb-8"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-black/10" />
@@ -82,13 +96,47 @@ export function AreaShapePicker({ onPick, onClose }: AreaShapePickerProps) {
         </div>
 
         {selected && (
-          <div className="mt-3">
+          <div className="mt-4 flex flex-col gap-3">
+            {/* Label */}
             <TextInput
               value={label}
               onChange={(e) => setLabel(e.target.value)}
               placeholder={t('gardenLayout.shapePicker.labelPlaceholder')}
               className="w-full"
             />
+
+            {/* Dimensions */}
+            <div>
+              <div className="mb-1.5 text-xs font-medium text-ink-muted">
+                {t('gardenLayout.shapePicker.dimensions')}
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex flex-1 items-center gap-1">
+                  <TextInput
+                    value={widthStr}
+                    onChange={(e) => setWidthStr(e.target.value)}
+                    placeholder={t('gardenLayout.shapePicker.width')}
+                    inputMode="decimal"
+                    className="w-full"
+                  />
+                  <span className="text-xs text-ink-muted">cm</span>
+                </div>
+                <span className="text-ink-muted">\u00D7</span>
+                <div className="flex flex-1 items-center gap-1">
+                  <TextInput
+                    value={heightStr}
+                    onChange={(e) => setHeightStr(e.target.value)}
+                    placeholder={t('gardenLayout.shapePicker.height')}
+                    inputMode="decimal"
+                    className="w-full"
+                  />
+                  <span className="text-xs text-ink-muted">cm</span>
+                </div>
+              </div>
+              <p className="mt-1 text-[10px] text-ink-muted">
+                {t('gardenLayout.shapePicker.dimensionsHint')}
+              </p>
+            </div>
           </div>
         )}
 

@@ -174,6 +174,8 @@ export interface GardenArea {
   fill_color: string; // hex
   x: number; // canvas position
   y: number;
+  width_cm?: number | null; // real-world width in centimeters
+  height_cm?: number | null; // real-world height in centimeters
 }
 
 export type MarkerType = 'water_source' | 'compass';

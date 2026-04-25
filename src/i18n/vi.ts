@@ -500,6 +500,10 @@ const vi: Record<string, string> = {
   'gardenLayout.shapePicker.uShape': 'H\u00ECnh ch\u1EEF U',
   'gardenLayout.shapePicker.uShape.desc': 'Khu v\u1EF1c h\u00ECnh ch\u1EEF U ho\u1EB7c bao quanh.',
   'gardenLayout.shapePicker.labelPlaceholder': 'V\u00ED d\u1EE5: Ban c\u00F4ng ch\u00EDnh',
+  'gardenLayout.shapePicker.dimensions': 'K\u00EDch th\u01B0\u1EDBc th\u1EF1c (tu\u1EF3 ch\u1ECDn)',
+  'gardenLayout.shapePicker.width': 'Chi\u1EC1u r\u1ED9ng',
+  'gardenLayout.shapePicker.height': 'Chi\u1EC1u s\u00E2u',
+  'gardenLayout.shapePicker.dimensionsHint': 'Nh\u1EADp k\u00EDch th\u01B0\u1EDBc th\u1EF1c \u0111\u1EC3 \u0111\u1EB7t ch\u1EADu \u0111\u00FAng t\u1EF7 l\u1EC7.',
 
   // Plant palette
   'gardenLayout.palette.heading': '\u0110\u1EB7t c\u00E2y',

@@ -298,8 +298,8 @@ export function GardenLayoutScreen() {
       {/* Bottom sheets */}
       {showShapePicker && (
         <AreaShapePicker
-          onPick={(template, label) => {
-            state.addArea(template, label);
+          onPick={(template, label, widthCm, heightCm) => {
+            state.addArea(template, label, widthCm, heightCm);
             setShowShapePicker(false);
           }}
           onClose={() => setShowShapePicker(false)}
