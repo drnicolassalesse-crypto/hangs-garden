@@ -16,6 +16,7 @@ import { SpeciesLibraryScreen } from './features/species/SpeciesLibraryScreen';
 import { CustomSpeciesForm } from './features/species/CustomSpeciesForm';
 import { FertilizersScreen } from './features/fertilizers/FertilizersScreen';
 import { FertilizerForm } from './features/fertilizers/FertilizerForm';
+import { GardenLayoutScreen } from './features/garden-layout/GardenLayoutScreen';
 
 export default function App() {
   return (
@@ -35,6 +36,7 @@ export default function App() {
         <Route path="/plants" element={<MyPlantsScreen />} />
         <Route path="/sites" element={<SitesScreen />} />
         <Route path="/sites/:siteId" element={<SiteDetailScreen />} />
+        <Route path="/sites/:siteId/layout" element={<GardenLayoutScreen />} />
         <Route path="/settings" element={<SettingsScreen />} />
         <Route path="/species" element={<SpeciesLibraryScreen />} />
         <Route path="/species/new" element={<CustomSpeciesForm />} />

@@ -159,6 +159,33 @@ export function SiteDetailScreen() {
         </div>
       )}
 
+      {/* Garden Layout entry point */}
+      <NavLink
+        to={`/sites/${siteId}/layout`}
+        className={`mb-4 flex items-center gap-3 rounded-2xl p-4 ${
+          site.layout
+            ? 'bg-card shadow-sm'
+            : 'border-2 border-dashed border-black/10'
+        }`}
+      >
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-xl">
+          {'\u{1F5FA}'}
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="text-sm font-medium text-ink">
+            {site.layout
+              ? t('gardenLayout.viewLayout')
+              : t('gardenLayout.createLayout')}
+          </div>
+          {!site.layout && (
+            <div className="text-xs text-ink-muted">
+              {t('gardenLayout.createLayout.hint')}
+            </div>
+          )}
+        </div>
+        <span className="text-ink-muted">&rsaquo;</span>
+      </NavLink>
+
       {rows.length === 0 ? (
         <div className="rounded-2xl border-2 border-dashed border-black/10 p-6 text-center">
           <p className="mb-3 text-sm text-ink-muted">

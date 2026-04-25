@@ -16,6 +16,7 @@ const en: Record<string, string> = {
   'common.upload': 'Upload',
   'common.replace': 'Replace',
   'common.create': 'Create',
+  'common.add': 'Add',
   'common.saveChanges': 'Save changes',
   'common.day_one': '{{count}} day',
   'common.day_other': '{{count}} days',
@@ -468,6 +469,51 @@ const en: Record<string, string> = {
   'notif.action.repot.past': 'repotted',
   'notif.action.prune.past': 'pruned',
   'notif.action.clean.past': 'cleaned',
+
+  // ── Garden Layout ──────────────────────────────────────────
+  'gardenLayout.back': '\u2190 Site',
+  'gardenLayout.heading': 'Garden Layout',
+  'gardenLayout.createLayout': 'Create garden layout',
+  'gardenLayout.createLayout.hint': 'Arrange your plants on a map of this space.',
+  'gardenLayout.viewLayout': 'View garden layout',
+  'gardenLayout.saving': 'Saving\u2026',
+  'gardenLayout.saved': 'Saved',
+
+  // Toolbar
+  'gardenLayout.toolbar.edit': 'Edit',
+  'gardenLayout.toolbar.done': 'Done',
+  'gardenLayout.toolbar.addArea': '+ Area',
+  'gardenLayout.toolbar.deleteArea': 'Delete area',
+  'gardenLayout.toolbar.deleteMarker': 'Delete',
+  'gardenLayout.toolbar.areas': 'Areas',
+  'gardenLayout.toolbar.plants': 'Plants',
+  'gardenLayout.toolbar.markers': 'Markers',
+  'gardenLayout.toolbar.placePlants': 'Place plants',
+  'gardenLayout.toolbar.addMarker': '+ Marker',
+
+  // Shape picker
+  'gardenLayout.shapePicker.heading': 'Add an area',
+  'gardenLayout.shapePicker.rectangle': 'Rectangle',
+  'gardenLayout.shapePicker.rectangle.desc': 'Simple room or balcony.',
+  'gardenLayout.shapePicker.lShape': 'L-shape',
+  'gardenLayout.shapePicker.lShape.desc': 'L-shaped balcony or room.',
+  'gardenLayout.shapePicker.uShape': 'U-shape',
+  'gardenLayout.shapePicker.uShape.desc': 'U-shaped area or wraparound.',
+  'gardenLayout.shapePicker.labelPlaceholder': 'e.g. Main balcony',
+
+  // Plant palette
+  'gardenLayout.palette.heading': 'Place plants',
+  'gardenLayout.palette.empty': 'All plants placed!',
+  'gardenLayout.palette.hint': 'Tap a plant, then tap on the layout to place it.',
+  'gardenLayout.palette.tapCanvas': 'Tap on the layout to place',
+
+  // Marker picker
+  'gardenLayout.markerPicker.heading': 'Add a marker',
+  'gardenLayout.markerPicker.waterSource': 'Water source',
+  'gardenLayout.markerPicker.compass': 'Compass / North',
+
+  // Canvas hints
+  'gardenLayout.canvas.pinchHint': 'Pinch to zoom \u00B7 Drag to pan',
 };
 
 export default en;

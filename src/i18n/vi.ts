@@ -16,6 +16,7 @@ const vi: Record<string, string> = {
   'common.upload': 'T\u1EA3i l\u00EAn',
   'common.replace': 'Thay th\u1EBF',
   'common.create': 'T\u1EA1o',
+  'common.add': 'Th\u00EAm',
   'common.saveChanges': 'L\u01B0u thay \u0111\u1ED5i',
   'common.day_one': '{{count}} ng\u00E0y',
   'common.day_other': '{{count}} ng\u00E0y',
@@ -468,6 +469,51 @@ const vi: Record<string, string> = {
   'notif.action.repot.past': 'thay ch\u1EADu',
   'notif.action.prune.past': 'c\u1EAFt t\u1EC9a',
   'notif.action.clean.past': 'v\u1EC7 sinh',
+
+  // ── Garden Layout ──────────────────────────────────────────
+  'gardenLayout.back': '\u2190 \u0110\u1ECBa \u0111i\u1EC3m',
+  'gardenLayout.heading': 'S\u01A1 \u0111\u1ED3 v\u01B0\u1EDDn',
+  'gardenLayout.createLayout': 'T\u1EA1o s\u01A1 \u0111\u1ED3 v\u01B0\u1EDDn',
+  'gardenLayout.createLayout.hint': 'S\u1EAFp x\u1EBFp c\u00E2y c\u1EE7a b\u1EA1n tr\u00EAn b\u1EA3n \u0111\u1ED3 kh\u00F4ng gian n\u00E0y.',
+  'gardenLayout.viewLayout': 'Xem s\u01A1 \u0111\u1ED3 v\u01B0\u1EDDn',
+  'gardenLayout.saving': '\u0110ang l\u01B0u\u2026',
+  'gardenLayout.saved': '\u0110\u00E3 l\u01B0u',
+
+  // Toolbar
+  'gardenLayout.toolbar.edit': 'S\u1EEDa',
+  'gardenLayout.toolbar.done': 'Xong',
+  'gardenLayout.toolbar.addArea': '+ Khu v\u1EF1c',
+  'gardenLayout.toolbar.deleteArea': 'X\u00F3a khu v\u1EF1c',
+  'gardenLayout.toolbar.deleteMarker': 'X\u00F3a',
+  'gardenLayout.toolbar.areas': 'Khu v\u1EF1c',
+  'gardenLayout.toolbar.plants': 'C\u00E2y',
+  'gardenLayout.toolbar.markers': '\u0110\u00E1nh d\u1EA5u',
+  'gardenLayout.toolbar.placePlants': '\u0110\u1EB7t c\u00E2y',
+  'gardenLayout.toolbar.addMarker': '+ \u0110\u00E1nh d\u1EA5u',
+
+  // Shape picker
+  'gardenLayout.shapePicker.heading': 'Th\u00EAm khu v\u1EF1c',
+  'gardenLayout.shapePicker.rectangle': 'H\u00ECnh ch\u1EEF nh\u1EADt',
+  'gardenLayout.shapePicker.rectangle.desc': 'Ph\u00F2ng ho\u1EB7c ban c\u00F4ng \u0111\u01A1n gi\u1EA3n.',
+  'gardenLayout.shapePicker.lShape': 'H\u00ECnh ch\u1EEF L',
+  'gardenLayout.shapePicker.lShape.desc': 'Ban c\u00F4ng ho\u1EB7c ph\u00F2ng h\u00ECnh ch\u1EEF L.',
+  'gardenLayout.shapePicker.uShape': 'H\u00ECnh ch\u1EEF U',
+  'gardenLayout.shapePicker.uShape.desc': 'Khu v\u1EF1c h\u00ECnh ch\u1EEF U ho\u1EB7c bao quanh.',
+  'gardenLayout.shapePicker.labelPlaceholder': 'V\u00ED d\u1EE5: Ban c\u00F4ng ch\u00EDnh',
+
+  // Plant palette
+  'gardenLayout.palette.heading': '\u0110\u1EB7t c\u00E2y',
+  'gardenLayout.palette.empty': 'T\u1EA5t c\u1EA3 c\u00E2y \u0111\u00E3 \u0111\u01B0\u1EE3c \u0111\u1EB7t!',
+  'gardenLayout.palette.hint': 'Ch\u1EA1m v\u00E0o c\u00E2y, sau \u0111\u00F3 ch\u1EA1m v\u00E0o s\u01A1 \u0111\u1ED3 \u0111\u1EC3 \u0111\u1EB7t.',
+  'gardenLayout.palette.tapCanvas': 'Ch\u1EA1m v\u00E0o s\u01A1 \u0111\u1ED3 \u0111\u1EC3 \u0111\u1EB7t',
+
+  // Marker picker
+  'gardenLayout.markerPicker.heading': 'Th\u00EAm \u0111\u00E1nh d\u1EA5u',
+  'gardenLayout.markerPicker.waterSource': 'Ngu\u1ED3n n\u01B0\u1EDBc',
+  'gardenLayout.markerPicker.compass': 'La b\u00E0n / H\u01B0\u1EDBng B\u1EAFc',
+
+  // Canvas hints
+  'gardenLayout.canvas.pinchHint': 'Ch\u1EE5m \u0111\u1EC3 ph\u00F3ng to \u00B7 K\u00E9o \u0111\u1EC3 di chuy\u1EC3n',
 };
 
 export default vi;

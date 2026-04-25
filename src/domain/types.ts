@@ -145,6 +145,7 @@ export interface Site {
   name: string;
   icon: string;
   created_at: number;
+  layout?: GardenLayout | null;
 }
 
 export interface JournalEntry {
@@ -154,6 +155,50 @@ export interface JournalEntry {
   content: string;
   photo_blob_ids: UUID[];
   tags: string[];
+}
+
+// ── Garden Layout types ─────────────────────────────────────
+
+export interface LayoutPoint {
+  x: number;
+  y: number;
+}
+
+export type AreaShapeTemplate = 'rectangle' | 'l_shape' | 'u_shape';
+
+export interface GardenArea {
+  id: UUID;
+  template: AreaShapeTemplate;
+  points: LayoutPoint[]; // closed polygon vertices (user-adjustable)
+  label: string;
+  fill_color: string; // hex
+  x: number; // canvas position
+  y: number;
+}
+
+export type MarkerType = 'water_source' | 'compass';
+
+export interface LayoutMarker {
+  id: UUID;
+  type: MarkerType;
+  x: number;
+  y: number;
+  rotation: number; // degrees — for compass: indicates North direction
+}
+
+export interface PlantPlacement {
+  pot_id: UUID;
+  x: number;
+  y: number;
+}
+
+export interface GardenLayout {
+  areas: GardenArea[];
+  plant_placements: PlantPlacement[];
+  markers: LayoutMarker[];
+  canvas_width: number; // logical size (default 800)
+  canvas_height: number; // logical size (default 600)
+  version: 1;
 }
 
 // PWA replacement for spec §2 Auth — single local profile.
