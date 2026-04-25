@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { NavLink, useNavigate, useParams } from 'react-router-dom';
 import {
   careTasksRepo,
@@ -25,6 +25,7 @@ export function GardenLayoutScreen() {
   const [site, setSite] = useState<Site | null>(null);
   const [summaries, setSummaries] = useState<PlantSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const didAutoOpen = useRef(false);
 
   // Load site and plant data
   const load = useCallback(async () => {
@@ -87,6 +88,20 @@ export function GardenLayoutScreen() {
   const [showPalette, setShowPalette] = useState(false);
   const [showMarkerPicker, setShowMarkerPicker] = useState(false);
 
+  // Auto-start in edit mode and open shape picker when layout is empty
+  const layoutIsEmpty =
+    state.layout.areas.length === 0 &&
+    state.layout.plant_placements.length === 0;
+
+  useEffect(() => {
+    if (!loading && layoutIsEmpty && !didAutoOpen.current) {
+      didAutoOpen.current = true;
+      state.setMode('edit_areas');
+      // Small delay so the toolbar renders first
+      setTimeout(() => setShowShapePicker(true), 300);
+    }
+  }, [loading, layoutIsEmpty, state]);
+
   // Plant summaries as a map for the canvas
   const summaryMap = useMemo(
     () => new Map(summaries.map((s) => [s.pot.id, s])),
@@ -108,7 +123,6 @@ export function GardenLayoutScreen() {
     (x: number, y: number) => {
       if (state.pendingPlantId) {
         state.placePlant(state.pendingPlantId, x, y);
-        // Keep palette open for placing more plants
       }
     },
     [state],
@@ -154,6 +168,9 @@ export function GardenLayoutScreen() {
     );
   }
 
+  const hasAreas = state.layout.areas.length > 0;
+  const hasPlants = state.layout.plant_placements.length > 0;
+
   return (
     <main className="flex h-screen flex-col bg-surface">
       {/* Header */}
@@ -178,21 +195,76 @@ export function GardenLayoutScreen() {
         )}
       </header>
 
+      {/* Step guide banner (only in edit modes when layout is sparse) */}
+      {state.mode !== 'view' && (
+        <div className="flex items-center gap-3 bg-primary/5 px-4 py-2">
+          <StepBadge n={1} active={state.mode === 'edit_areas'} done={hasAreas}>
+            {t('gardenLayout.toolbar.areas')}
+          </StepBadge>
+          <span className="text-ink-muted">&rsaquo;</span>
+          <StepBadge
+            n={2}
+            active={state.mode === 'place_plants'}
+            done={hasPlants}
+          >
+            {t('gardenLayout.toolbar.plants')}
+          </StepBadge>
+          <span className="text-ink-muted">&rsaquo;</span>
+          <StepBadge n={3} active={state.mode === 'place_markers'} done={false}>
+            {t('gardenLayout.toolbar.markers')}
+          </StepBadge>
+        </div>
+      )}
+
       {/* Canvas (fills available space) */}
-      <GardenCanvas
-        layout={state.layout}
-        plantSummaries={summaryMap}
-        mode={state.mode}
-        selectedId={state.selectedId}
-        onAreaMove={state.moveArea}
-        onAreaPointMove={state.updateAreaPoint}
-        onPlantMove={state.movePlant}
-        onPlantTap={handlePlantTap}
-        onCanvasTap={handleCanvasTap}
-        onMarkerMove={state.moveMarker}
-        onMarkerRotate={state.rotateMarker}
-        onSelect={state.select}
-      />
+      <div className="relative flex-1">
+        <GardenCanvas
+          layout={state.layout}
+          plantSummaries={summaryMap}
+          mode={state.mode}
+          selectedId={state.selectedId}
+          onAreaMove={state.moveArea}
+          onAreaPointMove={state.updateAreaPoint}
+          onPlantMove={state.movePlant}
+          onPlantTap={handlePlantTap}
+          onCanvasTap={handleCanvasTap}
+          onMarkerMove={state.moveMarker}
+          onMarkerRotate={state.rotateMarker}
+          onSelect={state.select}
+        />
+
+        {/* Empty state overlay */}
+        {layoutIsEmpty && state.mode === 'view' && (
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+            <p className="text-4xl">{'\u{1F33F}'}</p>
+            <p className="mt-2 text-sm font-medium text-ink">
+              {t('gardenLayout.empty.title')}
+            </p>
+            <p className="mt-1 text-xs text-ink-muted">
+              {t('gardenLayout.empty.subtitle')}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                state.setMode('edit_areas');
+                setShowShapePicker(true);
+              }}
+              className="pointer-events-auto mt-4 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-white active:scale-[0.98]"
+            >
+              {t('gardenLayout.empty.start')}
+            </button>
+          </div>
+        )}
+
+        {/* Empty canvas hint in edit mode with no areas */}
+        {!hasAreas && state.mode === 'edit_areas' && !showShapePicker && (
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+            <p className="text-sm text-ink-muted">
+              {t('gardenLayout.empty.tapAddArea')}
+            </p>
+          </div>
+        )}
+      </div>
 
       {/* Pending plant indicator */}
       {state.pendingPlantId && (
@@ -214,6 +286,7 @@ export function GardenLayoutScreen() {
           mode={state.mode}
           selectedId={state.selectedId}
           saving={state.saving}
+          hasPlants={summaries.length > 0}
           onSetMode={state.setMode}
           onAddArea={() => setShowShapePicker(true)}
           onDeleteSelected={handleDeleteSelected}
@@ -255,5 +328,43 @@ export function GardenLayoutScreen() {
         />
       )}
     </main>
+  );
+}
+
+/** Small step badge for the guided workflow banner */
+function StepBadge({
+  n,
+  active,
+  done,
+  children,
+}: {
+  n: number;
+  active: boolean;
+  done: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <span
+      className={`flex items-center gap-1.5 text-xs font-medium ${
+        active
+          ? 'text-primary'
+          : done
+            ? 'text-success'
+            : 'text-ink-muted'
+      }`}
+    >
+      <span
+        className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
+          active
+            ? 'bg-primary text-white'
+            : done
+              ? 'bg-success/20 text-success'
+              : 'bg-black/5 text-ink-muted'
+        }`}
+      >
+        {done ? '\u2713' : n}
+      </span>
+      {children}
+    </span>
   );
 }

@@ -512,6 +512,13 @@ const en: Record<string, string> = {
   'gardenLayout.markerPicker.waterSource': 'Water source',
   'gardenLayout.markerPicker.compass': 'Compass / North',
 
+  // Empty state
+  'gardenLayout.empty.title': 'Your garden layout is empty',
+  'gardenLayout.empty.subtitle': 'Start by adding the shape of your space.',
+  'gardenLayout.empty.start': 'Get started',
+  'gardenLayout.empty.tapAddArea': 'Tap "+ Area" below to add a shape.',
+  'gardenLayout.toolbar.noPlantsHint': 'Add plants to this site first.',
+
   // Canvas hints
   'gardenLayout.canvas.pinchHint': 'Pinch to zoom \u00B7 Drag to pan',
 };

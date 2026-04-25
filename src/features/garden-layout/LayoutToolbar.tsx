@@ -6,6 +6,7 @@ interface LayoutToolbarProps {
   mode: EditorMode;
   selectedId: UUID | null;
   saving: boolean;
+  hasPlants: boolean;
   onSetMode: (mode: EditorMode) => void;
   onAddArea: () => void;
   onDeleteSelected: () => void;
@@ -17,6 +18,7 @@ export function LayoutToolbar({
   mode,
   selectedId,
   saving,
+  hasPlants,
   onSetMode,
   onAddArea,
   onDeleteSelected,
@@ -25,7 +27,7 @@ export function LayoutToolbar({
 }: LayoutToolbarProps) {
   if (mode === 'view') {
     return (
-      <div className="flex items-center justify-between px-4 py-2">
+      <div className="flex items-center justify-between px-4 py-3">
         <span className="text-xs text-ink-muted">
           {saving
             ? t('gardenLayout.saving')
@@ -34,7 +36,7 @@ export function LayoutToolbar({
         <button
           type="button"
           onClick={() => onSetMode('edit_areas')}
-          className="rounded-full bg-primary px-4 py-2 text-sm text-white active:scale-[0.98]"
+          className="rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-white active:scale-[0.98]"
         >
           {t('gardenLayout.toolbar.edit')}
         </button>
@@ -43,7 +45,7 @@ export function LayoutToolbar({
   }
 
   return (
-    <div className="flex flex-col gap-2 px-4 py-2">
+    <div className="flex flex-col gap-2 px-4 py-3">
       {/* Mode tabs */}
       <div className="flex gap-1 rounded-full bg-surface p-1">
         <ModeTab
@@ -70,7 +72,7 @@ export function LayoutToolbar({
             <button
               type="button"
               onClick={onAddArea}
-              className="rounded-full bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary active:scale-[0.98]"
+              className="rounded-full bg-primary/10 px-3 py-2 text-sm font-medium text-primary active:scale-[0.98]"
             >
               {t('gardenLayout.toolbar.addArea')}
             </button>
@@ -78,7 +80,7 @@ export function LayoutToolbar({
               <button
                 type="button"
                 onClick={onDeleteSelected}
-                className="rounded-full bg-overdue/10 px-3 py-1.5 text-sm font-medium text-overdue active:scale-[0.98]"
+                className="rounded-full bg-overdue/10 px-3 py-2 text-sm font-medium text-overdue active:scale-[0.98]"
               >
                 {t('gardenLayout.toolbar.deleteArea')}
               </button>
@@ -87,13 +89,29 @@ export function LayoutToolbar({
         )}
 
         {mode === 'place_plants' && (
-          <button
-            type="button"
-            onClick={onOpenPalette}
-            className="rounded-full bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary active:scale-[0.98]"
-          >
-            {t('gardenLayout.toolbar.placePlants')}
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={onOpenPalette}
+              className="rounded-full bg-primary/10 px-3 py-2 text-sm font-medium text-primary active:scale-[0.98]"
+            >
+              {t('gardenLayout.toolbar.placePlants')}
+            </button>
+            {selectedId && (
+              <button
+                type="button"
+                onClick={onDeleteSelected}
+                className="rounded-full bg-overdue/10 px-3 py-2 text-sm font-medium text-overdue active:scale-[0.98]"
+              >
+                {t('common.remove')}
+              </button>
+            )}
+            {!hasPlants && (
+              <span className="text-xs text-ink-muted">
+                {t('gardenLayout.toolbar.noPlantsHint')}
+              </span>
+            )}
+          </>
         )}
 
         {mode === 'place_markers' && (
@@ -101,7 +119,7 @@ export function LayoutToolbar({
             <button
               type="button"
               onClick={onAddMarker}
-              className="rounded-full bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary active:scale-[0.98]"
+              className="rounded-full bg-primary/10 px-3 py-2 text-sm font-medium text-primary active:scale-[0.98]"
             >
               {t('gardenLayout.toolbar.addMarker')}
             </button>
@@ -109,7 +127,7 @@ export function LayoutToolbar({
               <button
                 type="button"
                 onClick={onDeleteSelected}
-                className="rounded-full bg-overdue/10 px-3 py-1.5 text-sm font-medium text-overdue active:scale-[0.98]"
+                className="rounded-full bg-overdue/10 px-3 py-2 text-sm font-medium text-overdue active:scale-[0.98]"
               >
                 {t('gardenLayout.toolbar.deleteMarker')}
               </button>
@@ -126,7 +144,7 @@ export function LayoutToolbar({
         <button
           type="button"
           onClick={() => onSetMode('view')}
-          className="rounded-full bg-primary px-4 py-1.5 text-sm text-white active:scale-[0.98]"
+          className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-white active:scale-[0.98]"
         >
           {t('gardenLayout.toolbar.done')}
         </button>
@@ -148,10 +166,8 @@ function ModeTab({
     <button
       type="button"
       onClick={onClick}
-      className={`flex-1 rounded-full px-3 py-1.5 text-center text-xs font-medium transition-colors ${
-        isActive
-          ? 'bg-white text-primary shadow-sm'
-          : 'text-ink-muted'
+      className={`flex-1 rounded-full px-3 py-2 text-center text-xs font-medium transition-colors ${
+        isActive ? 'bg-white text-primary shadow-sm' : 'text-ink-muted'
       }`}
     >
       {label}

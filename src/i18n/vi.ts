@@ -512,6 +512,13 @@ const vi: Record<string, string> = {
   'gardenLayout.markerPicker.waterSource': 'Ngu\u1ED3n n\u01B0\u1EDBc',
   'gardenLayout.markerPicker.compass': 'La b\u00E0n / H\u01B0\u1EDBng B\u1EAFc',
 
+  // Empty state
+  'gardenLayout.empty.title': 'S\u01A1 \u0111\u1ED3 v\u01B0\u1EDDn tr\u1ED1ng',
+  'gardenLayout.empty.subtitle': 'B\u1EAFt \u0111\u1EA7u b\u1EB1ng c\u00E1ch th\u00EAm h\u00ECnh d\u1EA1ng kh\u00F4ng gian.',
+  'gardenLayout.empty.start': 'B\u1EAFt \u0111\u1EA7u',
+  'gardenLayout.empty.tapAddArea': 'Ch\u1EA1m "+ Khu v\u1EF1c" b\u00EAn d\u01B0\u1EDBi \u0111\u1EC3 th\u00EAm h\u00ECnh d\u1EA1ng.',
+  'gardenLayout.toolbar.noPlantsHint': 'Th\u00EAm c\u00E2y v\u00E0o \u0111\u1ECBa \u0111i\u1EC3m n\u00E0y tr\u01B0\u1EDBc.',
+
   // Canvas hints
   'gardenLayout.canvas.pinchHint': 'Ch\u1EE5m \u0111\u1EC3 ph\u00F3ng to \u00B7 K\u00E9o \u0111\u1EC3 di chuy\u1EC3n',
 };
