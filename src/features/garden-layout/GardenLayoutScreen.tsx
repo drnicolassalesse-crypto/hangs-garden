@@ -16,6 +16,7 @@ import { LayoutToolbar } from './LayoutToolbar';
 import { AreaShapePicker } from './AreaShapePicker';
 import { PlantPalette } from './PlantPalette';
 import { MarkerPicker } from './MarkerPicker';
+import { ObjectListPanel } from './ObjectListPanel';
 import { saveLayout } from './actions';
 
 export function GardenLayoutScreen() {
@@ -87,6 +88,7 @@ export function GardenLayoutScreen() {
   const [showShapePicker, setShowShapePicker] = useState(false);
   const [showPalette, setShowPalette] = useState(false);
   const [showMarkerPicker, setShowMarkerPicker] = useState(false);
+  const [showObjectList, setShowObjectList] = useState(false);
 
   // Auto-start in edit mode and open shape picker when layout is empty
   const layoutIsEmpty =
@@ -225,6 +227,7 @@ export function GardenLayoutScreen() {
           selectedId={state.selectedId}
           onAreaMove={state.moveArea}
           onAreaPointMove={state.updateAreaPoint}
+          onAreaInsertPoint={state.insertAreaPoint}
           onPlantMove={state.movePlant}
           onPlantTap={handlePlantTap}
           onCanvasTap={handleCanvasTap}
@@ -287,11 +290,13 @@ export function GardenLayoutScreen() {
           selectedId={state.selectedId}
           saving={state.saving}
           hasPlants={summaries.length > 0}
+          hasAreas={hasAreas}
           onSetMode={state.setMode}
           onAddArea={() => setShowShapePicker(true)}
           onDeleteSelected={handleDeleteSelected}
           onOpenPalette={() => setShowPalette(true)}
           onAddMarker={() => setShowMarkerPicker(true)}
+          onOpenObjectList={() => setShowObjectList(true)}
         />
       </div>
 
@@ -325,6 +330,21 @@ export function GardenLayoutScreen() {
             setShowMarkerPicker(false);
           }}
           onClose={() => setShowMarkerPicker(false)}
+        />
+      )}
+
+      {showObjectList && (
+        <ObjectListPanel
+          areas={state.layout.areas}
+          selectedId={state.selectedId}
+          onSelect={(id) => {
+            state.select(id);
+            setShowObjectList(false);
+          }}
+          onToggleVisibility={state.setAreaVisibility}
+          onUpdateLabel={state.updateAreaLabel}
+          onResizeArea={state.resizeArea}
+          onClose={() => setShowObjectList(false)}
         />
       )}
     </main>

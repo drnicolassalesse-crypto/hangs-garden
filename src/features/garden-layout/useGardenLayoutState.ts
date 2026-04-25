@@ -13,13 +13,17 @@ import {
   addPlantToLayout,
   createDefaultArea,
   emptyLayout,
+  insertAreaPoint,
   moveArea,
   moveMarker,
   movePlantInLayout,
   removeArea,
   removeMarker,
   removePlantFromLayout,
+  resizeAreaToDimensions,
   rotateMarker,
+  setAreaVisibility,
+  snapPoint,
   updateAreaLabel,
   updateAreaPoint,
 } from '../../domain/gardenLayout';
@@ -119,7 +123,7 @@ export function useGardenLayoutState(
 
   const handleUpdateAreaPoint = useCallback(
     (areaId: UUID, pointIndex: number, point: LayoutPoint) => {
-      update(updateAreaPoint(layout, areaId, pointIndex, point));
+      update(updateAreaPoint(layout, areaId, pointIndex, snapPoint(point)));
     },
     [layout, update],
   );
@@ -127,6 +131,27 @@ export function useGardenLayoutState(
   const handleUpdateAreaLabel = useCallback(
     (areaId: UUID, label: string) => {
       update(updateAreaLabel(layout, areaId, label));
+    },
+    [layout, update],
+  );
+
+  const handleInsertAreaPoint = useCallback(
+    (areaId: UUID, afterIndex: number, point: LayoutPoint) => {
+      update(insertAreaPoint(layout, areaId, afterIndex, snapPoint(point)));
+    },
+    [layout, update],
+  );
+
+  const handleResizeArea = useCallback(
+    (areaId: UUID, widthCm: number, heightCm: number) => {
+      update(resizeAreaToDimensions(layout, areaId, widthCm, heightCm));
+    },
+    [layout, update],
+  );
+
+  const handleSetAreaVisibility = useCallback(
+    (areaId: UUID, visible: boolean) => {
+      update(setAreaVisibility(layout, areaId, visible));
     },
     [layout, update],
   );
@@ -224,6 +249,9 @@ export function useGardenLayoutState(
     moveArea: handleMoveArea,
     updateAreaPoint: handleUpdateAreaPoint,
     updateAreaLabel: handleUpdateAreaLabel,
+    insertAreaPoint: handleInsertAreaPoint,
+    resizeArea: handleResizeArea,
+    setAreaVisibility: handleSetAreaVisibility,
     // Plants
     placePlant: handlePlacePlant,
     movePlant: handleMovePlant,

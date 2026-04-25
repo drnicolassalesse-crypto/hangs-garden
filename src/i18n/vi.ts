@@ -490,6 +490,7 @@ const vi: Record<string, string> = {
   'gardenLayout.toolbar.markers': '\u0110\u00E1nh d\u1EA5u',
   'gardenLayout.toolbar.placePlants': '\u0110\u1EB7t c\u00E2y',
   'gardenLayout.toolbar.addMarker': '+ \u0110\u00E1nh d\u1EA5u',
+  'gardenLayout.toolbar.objectList': 'Danh s\u00E1ch',
 
   // Shape picker
   'gardenLayout.shapePicker.heading': 'Th\u00EAm khu v\u1EF1c',
@@ -510,6 +511,11 @@ const vi: Record<string, string> = {
   'gardenLayout.palette.empty': 'T\u1EA5t c\u1EA3 c\u00E2y \u0111\u00E3 \u0111\u01B0\u1EE3c \u0111\u1EB7t!',
   'gardenLayout.palette.hint': 'Ch\u1EA1m v\u00E0o c\u00E2y, sau \u0111\u00F3 ch\u1EA1m v\u00E0o s\u01A1 \u0111\u1ED3 \u0111\u1EC3 \u0111\u1EB7t.',
   'gardenLayout.palette.tapCanvas': 'Ch\u1EA1m v\u00E0o s\u01A1 \u0111\u1ED3 \u0111\u1EC3 \u0111\u1EB7t',
+
+  // Object list panel
+  'gardenLayout.objectList.heading': 'Khu v\u1EF1c',
+  'gardenLayout.objectList.empty': 'Ch\u01B0a c\u00F3 khu v\u1EF1c n\u00E0o.',
+  'gardenLayout.objectList.untitled': 'Khu v\u1EF1c ch\u01B0a \u0111\u1EB7t t\u00EAn',
 
   // Marker picker
   'gardenLayout.markerPicker.heading': 'Th\u00EAm \u0111\u00E1nh d\u1EA5u',

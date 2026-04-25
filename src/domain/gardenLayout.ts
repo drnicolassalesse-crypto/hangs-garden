@@ -151,6 +151,123 @@ export function updateAreaLabel(
   };
 }
 
+export function insertAreaPoint(
+  layout: GardenLayout,
+  areaId: UUID,
+  afterIndex: number,
+  point: LayoutPoint,
+): GardenLayout {
+  return {
+    ...layout,
+    areas: layout.areas.map((a) => {
+      if (a.id !== areaId) return a;
+      const points = [...a.points];
+      points.splice(afterIndex + 1, 0, point);
+      return { ...a, points };
+    }),
+  };
+}
+
+export function resizeAreaToDimensions(
+  layout: GardenLayout,
+  areaId: UUID,
+  widthCm: number,
+  heightCm: number,
+): GardenLayout {
+  return {
+    ...layout,
+    areas: layout.areas.map((a) => {
+      if (a.id !== areaId) return a;
+      const xs = a.points.map((p) => p.x);
+      const ys = a.points.map((p) => p.y);
+      const minX = Math.min(...xs);
+      const minY = Math.min(...ys);
+      const curW = Math.max(...xs) - minX;
+      const curH = Math.max(...ys) - minY;
+      if (curW === 0 || curH === 0) return a;
+      const targetW = widthCm * PX_PER_CM;
+      const targetH = heightCm * PX_PER_CM;
+      const sx = targetW / curW;
+      const sy = targetH / curH;
+      const points = a.points.map((p) => ({
+        x: minX + (p.x - minX) * sx,
+        y: minY + (p.y - minY) * sy,
+      }));
+      return { ...a, points, width_cm: widthCm, height_cm: heightCm };
+    }),
+  };
+}
+
+export function setAreaVisibility(
+  layout: GardenLayout,
+  areaId: UUID,
+  visible: boolean,
+): GardenLayout {
+  return {
+    ...layout,
+    areas: layout.areas.map((a) =>
+      a.id === areaId ? { ...a, visible } : a,
+    ),
+  };
+}
+
+// ── Grid snapping ─────────────────────────────────────────
+
+export const GRID_SIZE = 20;
+
+export function snapToGrid(value: number): number {
+  return Math.round(value / GRID_SIZE) * GRID_SIZE;
+}
+
+export function snapPoint(point: LayoutPoint): LayoutPoint {
+  return { x: snapToGrid(point.x), y: snapToGrid(point.y) };
+}
+
+/**
+ * Find the closest grid-intersection point on a line segment AB.
+ * Returns the point and the segment index, or null if none is close enough.
+ */
+export function findGridPointOnSegment(
+  a: LayoutPoint,
+  b: LayoutPoint,
+  maxDist: number,
+): LayoutPoint | null {
+  // Walk grid intersections and find ones near the segment
+  const minX = Math.min(a.x, b.x) - GRID_SIZE;
+  const maxX = Math.max(a.x, b.x) + GRID_SIZE;
+  const minY = Math.min(a.y, b.y) - GRID_SIZE;
+  const maxY = Math.max(a.y, b.y) + GRID_SIZE;
+
+  let best: LayoutPoint | null = null;
+  let bestDistSq = maxDist * maxDist;
+
+  for (let gx = snapToGrid(minX); gx <= maxX; gx += GRID_SIZE) {
+    for (let gy = snapToGrid(minY); gy <= maxY; gy += GRID_SIZE) {
+      // Skip if this grid point is too close to either endpoint
+      const daX = gx - a.x, daY = gy - a.y;
+      const dbX = gx - b.x, dbY = gy - b.y;
+      if (daX * daX + daY * daY < GRID_SIZE * GRID_SIZE * 0.25) continue;
+      if (dbX * dbX + dbY * dbY < GRID_SIZE * GRID_SIZE * 0.25) continue;
+
+      // Distance from point to line segment
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const lenSq = dx * dx + dy * dy;
+      if (lenSq === 0) continue;
+      const t = Math.max(0, Math.min(1, ((gx - a.x) * dx + (gy - a.y) * dy) / lenSq));
+      const projX = a.x + t * dx;
+      const projY = a.y + t * dy;
+      const distSq = (gx - projX) ** 2 + (gy - projY) ** 2;
+
+      if (distSq < bestDistSq) {
+        bestDistSq = distSq;
+        best = { x: gx, y: gy };
+      }
+    }
+  }
+  return best;
+}
+
 // ── Plant placement operations ────────────────────────────
 
 export function addPlantToLayout(

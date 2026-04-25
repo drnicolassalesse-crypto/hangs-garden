@@ -176,6 +176,7 @@ export interface GardenArea {
   y: number;
   width_cm?: number | null; // real-world width in centimeters
   height_cm?: number | null; // real-world height in centimeters
+  visible?: boolean; // default true when undefined
 }
 
 export type MarkerType = 'water_source' | 'compass';

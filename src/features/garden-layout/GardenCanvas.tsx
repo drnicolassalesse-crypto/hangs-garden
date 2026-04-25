@@ -20,6 +20,11 @@ interface GardenCanvasProps {
     pointIndex: number,
     point: { x: number; y: number },
   ) => void;
+  onAreaInsertPoint: (
+    areaId: UUID,
+    afterIndex: number,
+    point: { x: number; y: number },
+  ) => void;
   onPlantMove: (potId: UUID, x: number, y: number) => void;
   onPlantTap: (potId: UUID) => void;
   onCanvasTap: (x: number, y: number) => void;
@@ -50,6 +55,7 @@ export function GardenCanvas({
   selectedId,
   onAreaMove,
   onAreaPointMove,
+  onAreaInsertPoint,
   onPlantMove,
   onPlantTap,
   onCanvasTap,
@@ -229,6 +235,7 @@ export function GardenCanvas({
               isEditable={mode === 'edit_areas'}
               onDragEnd={(x, y) => onAreaMove(area.id, x, y)}
               onPointDragEnd={(idx, pt) => onAreaPointMove(area.id, idx, pt)}
+              onInsertPoint={(idx, pt) => onAreaInsertPoint(area.id, idx, pt)}
               onSelect={() => onSelect(area.id)}
             />
           ))}

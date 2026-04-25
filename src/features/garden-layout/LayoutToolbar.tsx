@@ -7,11 +7,13 @@ interface LayoutToolbarProps {
   selectedId: UUID | null;
   saving: boolean;
   hasPlants: boolean;
+  hasAreas: boolean;
   onSetMode: (mode: EditorMode) => void;
   onAddArea: () => void;
   onDeleteSelected: () => void;
   onOpenPalette: () => void;
   onAddMarker: () => void;
+  onOpenObjectList: () => void;
 }
 
 export function LayoutToolbar({
@@ -19,11 +21,13 @@ export function LayoutToolbar({
   selectedId,
   saving,
   hasPlants,
+  hasAreas,
   onSetMode,
   onAddArea,
   onDeleteSelected,
   onOpenPalette,
   onAddMarker,
+  onOpenObjectList,
 }: LayoutToolbarProps) {
   if (mode === 'view') {
     return (
@@ -76,6 +80,15 @@ export function LayoutToolbar({
             >
               {t('gardenLayout.toolbar.addArea')}
             </button>
+            {hasAreas && (
+              <button
+                type="button"
+                onClick={onOpenObjectList}
+                className="rounded-full bg-primary/10 px-3 py-2 text-sm font-medium text-primary active:scale-[0.98]"
+              >
+                {t('gardenLayout.toolbar.objectList')}
+              </button>
+            )}
             {selectedId && (
               <button
                 type="button"

@@ -490,6 +490,7 @@ const en: Record<string, string> = {
   'gardenLayout.toolbar.markers': 'Markers',
   'gardenLayout.toolbar.placePlants': 'Place plants',
   'gardenLayout.toolbar.addMarker': '+ Marker',
+  'gardenLayout.toolbar.objectList': 'List',
 
   // Shape picker
   'gardenLayout.shapePicker.heading': 'Add an area',
@@ -510,6 +511,11 @@ const en: Record<string, string> = {
   'gardenLayout.palette.empty': 'All plants placed!',
   'gardenLayout.palette.hint': 'Tap a plant, then tap on the layout to place it.',
   'gardenLayout.palette.tapCanvas': 'Tap on the layout to place',
+
+  // Object list panel
+  'gardenLayout.objectList.heading': 'Areas',
+  'gardenLayout.objectList.empty': 'No areas yet.',
+  'gardenLayout.objectList.untitled': 'Untitled area',
 
   // Marker picker
   'gardenLayout.markerPicker.heading': 'Add a marker',
