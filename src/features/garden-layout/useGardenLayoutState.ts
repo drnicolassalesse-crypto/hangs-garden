@@ -14,9 +14,9 @@ import {
   createDefaultArea,
   emptyLayout,
   insertAreaPoint,
-  moveArea,
   moveMarker,
   movePlantInLayout,
+  PX_PER_CM,
   removeArea,
   removeMarker,
   removePlantFromLayout,
@@ -29,20 +29,27 @@ import {
 } from '../../domain/gardenLayout';
 import { saveLayout } from './actions';
 
-export type EditorMode =
-  | 'view'
-  | 'edit_areas'
-  | 'place_plants'
-  | 'place_markers';
+// ── Interaction state machine ────────────────────────────
 
-export interface GardenLayoutState {
-  layout: GardenLayout;
-  mode: EditorMode;
-  selectedId: UUID | null;
-  pendingPlantId: UUID | null;
-  isDirty: boolean;
-  saving: boolean;
-}
+export type InteractionState =
+  | { kind: 'idle' }
+  | { kind: 'area_selected'; areaId: UUID }
+  | {
+      kind: 'point_selected';
+      areaId: UUID;
+      pointIndex: number;
+      originalPoint: LayoutPoint;
+    }
+  | {
+      kind: 'measure';
+      activeEdge?: {
+        areaId: UUID;
+        edgeIndex: number;
+        lengthCm: number;
+      };
+    };
+
+// ── Hook ─────────────────────────────────────────────────
 
 export function useGardenLayoutState(
   siteId: UUID,
@@ -51,11 +58,13 @@ export function useGardenLayoutState(
   const [layout, setLayout] = useState<GardenLayout>(
     () => initialLayout ?? emptyLayout(),
   );
-  const [mode, setMode] = useState<EditorMode>('view');
-  const [selectedId, setSelectedId] = useState<UUID | null>(null);
-  const [pendingPlantId, setPendingPlantId] = useState<UUID | null>(null);
+  const [interaction, setInteraction] = useState<InteractionState>({
+    kind: 'idle',
+  });
   const [isDirty, setIsDirty] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [undoStack, setUndoStack] = useState<GardenLayout[]>([]);
+  const [pendingPlantId, setPendingPlantId] = useState<UUID | null>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Re-initialize when the initial layout changes (e.g. after load)
@@ -82,12 +91,138 @@ export function useGardenLayoutState(
     };
   }, [isDirty, layout, siteId]);
 
-  const update = useCallback((next: GardenLayout) => {
-    setLayout(next);
-    setIsDirty(true);
+  // ── Undo ──────────────────────────────────────────────
+
+  const pushUndo = useCallback(() => {
+    setUndoStack((prev) => [...prev, layout]);
+  }, [layout]);
+
+  const update = useCallback(
+    (next: GardenLayout) => {
+      pushUndo();
+      setLayout(next);
+      setIsDirty(true);
+    },
+    [pushUndo],
+  );
+
+  const undo = useCallback(() => {
+    setUndoStack((prev) => {
+      if (prev.length === 0) return prev;
+      const restored = prev[prev.length - 1];
+      setLayout(restored);
+      setIsDirty(true);
+      // If we were in point_selected, go back to area_selected
+      setInteraction((cur) => {
+        if (cur.kind === 'point_selected') {
+          return { kind: 'area_selected', areaId: cur.areaId };
+        }
+        return cur;
+      });
+      return prev.slice(0, -1);
+    });
   }, []);
 
+  const canUndo = undoStack.length > 0;
+
+  // ── Interaction state transitions ─────────────────────
+
+  const deselect = useCallback(() => {
+    setInteraction((cur) => {
+      if (cur.kind === 'measure') return { kind: 'measure' }; // stay in measure but clear edge
+      return { kind: 'idle' };
+    });
+  }, []);
+
+  const selectArea = useCallback((areaId: UUID) => {
+    setInteraction((cur) => {
+      if (cur.kind === 'measure') {
+        return { kind: 'measure' }; // in measure mode, selecting area shows edges
+      }
+      return { kind: 'area_selected', areaId };
+    });
+  }, []);
+
+  const selectPoint = useCallback(
+    (areaId: UUID, pointIndex: number) => {
+      const area = layout.areas.find((a) => a.id === areaId);
+      if (!area) return;
+      const originalPoint = { ...area.points[pointIndex] };
+      setInteraction({
+        kind: 'point_selected',
+        areaId,
+        pointIndex,
+        originalPoint,
+      });
+    },
+    [layout],
+  );
+
+  const fixPoint = useCallback(() => {
+    setInteraction((cur) => {
+      if (cur.kind === 'point_selected') {
+        return { kind: 'area_selected', areaId: cur.areaId };
+      }
+      return cur;
+    });
+  }, []);
+
+  const toggleMeasure = useCallback(() => {
+    setInteraction((cur) => {
+      if (cur.kind === 'measure') return { kind: 'idle' };
+      return { kind: 'measure' };
+    });
+  }, []);
+
+  const setMeasureEdge = useCallback(
+    (areaId: UUID, edgeIndex: number) => {
+      const area = layout.areas.find((a) => a.id === areaId);
+      if (!area) return;
+      const p1 = area.points[edgeIndex];
+      const p2 = area.points[(edgeIndex + 1) % area.points.length];
+      const dx = p2.x - p1.x;
+      const dy = p2.y - p1.y;
+      const lengthPx = Math.sqrt(dx * dx + dy * dy);
+      const lengthCm = Math.round((lengthPx / PX_PER_CM) * 10) / 10;
+      setInteraction({ kind: 'measure', activeEdge: { areaId, edgeIndex, lengthCm } });
+    },
+    [layout],
+  );
+
+  const applyEdgeLength = useCallback(
+    (newLengthCm: number) => {
+      if (interaction.kind !== 'measure' || !interaction.activeEdge) return;
+      const { areaId, edgeIndex } = interaction.activeEdge;
+      const area = layout.areas.find((a) => a.id === areaId);
+      if (!area) return;
+
+      const p1 = area.points[edgeIndex];
+      const p2Idx = (edgeIndex + 1) % area.points.length;
+      const p2 = area.points[p2Idx];
+      const dx = p2.x - p1.x;
+      const dy = p2.y - p1.y;
+      const curLen = Math.sqrt(dx * dx + dy * dy);
+      if (curLen === 0) return;
+
+      const targetLen = newLengthCm * PX_PER_CM;
+      const scale = targetLen / curLen;
+      const newP2 = snapPoint({
+        x: p1.x + dx * scale,
+        y: p1.y + dy * scale,
+      });
+
+      update(updateAreaPoint(layout, areaId, p2Idx, newP2));
+      // Update the displayed measurement
+      setInteraction({
+        kind: 'measure',
+        activeEdge: { areaId, edgeIndex, lengthCm: newLengthCm },
+      });
+    },
+    [interaction, layout, update],
+  );
+
   // ── Area actions ──────────────────────────────────────
+
   const handleAddArea = useCallback(
     (
       template: AreaShapeTemplate,
@@ -101,7 +236,7 @@ export function useGardenLayoutState(
         heightCm,
       });
       update(addArea(layout, area));
-      setSelectedId(area.id);
+      setInteraction({ kind: 'area_selected', areaId: area.id });
     },
     [layout, update],
   );
@@ -109,21 +244,29 @@ export function useGardenLayoutState(
   const handleRemoveArea = useCallback(
     (areaId: UUID) => {
       update(removeArea(layout, areaId));
-      if (selectedId === areaId) setSelectedId(null);
+      deselect();
     },
-    [layout, update, selectedId],
+    [layout, update, deselect],
   );
 
-  const handleMoveArea = useCallback(
-    (areaId: UUID, x: number, y: number) => {
-      update(moveArea(layout, areaId, x, y));
-    },
-    [layout, update],
-  );
-
-  const handleUpdateAreaPoint = useCallback(
+  const handleMoveAreaPoint = useCallback(
     (areaId: UUID, pointIndex: number, point: LayoutPoint) => {
-      update(updateAreaPoint(layout, areaId, pointIndex, snapPoint(point)));
+      // Don't push undo on every drag move — only on first move (handled by caller)
+      setLayout(updateAreaPoint(layout, areaId, pointIndex, snapPoint(point)));
+      setIsDirty(true);
+    },
+    [layout],
+  );
+
+  const handleCommitPointMove = useCallback(() => {
+    // Push undo snapshot for the point move (before move started)
+    // The originalPoint is saved in interaction state
+    fixPoint();
+  }, [fixPoint]);
+
+  const handleInsertAreaPoint = useCallback(
+    (areaId: UUID, afterIndex: number, point: LayoutPoint) => {
+      update(insertAreaPoint(layout, areaId, afterIndex, snapPoint(point)));
     },
     [layout, update],
   );
@@ -131,13 +274,6 @@ export function useGardenLayoutState(
   const handleUpdateAreaLabel = useCallback(
     (areaId: UUID, label: string) => {
       update(updateAreaLabel(layout, areaId, label));
-    },
-    [layout, update],
-  );
-
-  const handleInsertAreaPoint = useCallback(
-    (areaId: UUID, afterIndex: number, point: LayoutPoint) => {
-      update(insertAreaPoint(layout, areaId, afterIndex, snapPoint(point)));
     },
     [layout, update],
   );
@@ -157,6 +293,7 @@ export function useGardenLayoutState(
   );
 
   // ── Plant actions ──────────────────────────────────────
+
   const handlePlacePlant = useCallback(
     (potId: UUID, x: number, y: number) => {
       update(addPlantToLayout(layout, potId, x, y));
@@ -175,18 +312,15 @@ export function useGardenLayoutState(
   const handleRemovePlant = useCallback(
     (potId: UUID) => {
       update(removePlantFromLayout(layout, potId));
-      if (selectedId === potId) setSelectedId(null);
     },
-    [layout, update, selectedId],
+    [layout, update],
   );
 
   // ── Marker actions ─────────────────────────────────────
+
   const handleAddMarker = useCallback(
     (type: MarkerType, x: number, y: number) => {
-      const next = addMarker(layout, type, x, y, newId);
-      update(next);
-      const added = next.markers[next.markers.length - 1];
-      setSelectedId(added.id);
+      update(addMarker(layout, type, x, y, newId));
     },
     [layout, update],
   );
@@ -194,9 +328,8 @@ export function useGardenLayoutState(
   const handleRemoveMarker = useCallback(
     (markerId: UUID) => {
       update(removeMarker(layout, markerId));
-      if (selectedId === markerId) setSelectedId(null);
     },
-    [layout, update, selectedId],
+    [layout, update],
   );
 
   const handleMoveMarker = useCallback(
@@ -213,43 +346,32 @@ export function useGardenLayoutState(
     [layout, update],
   );
 
-  // ── Selection / mode ───────────────────────────────────
-  const handleSelect = useCallback((id: UUID | null) => {
-    setSelectedId(id);
-  }, []);
-
-  const handleSetMode = useCallback((m: EditorMode) => {
-    setMode(m);
-    setSelectedId(null);
-    setPendingPlantId(null);
-  }, []);
-
-  // Force save now (for unmount)
-  const forceSave = useCallback(async () => {
-    if (saveTimer.current) clearTimeout(saveTimer.current);
-    if (isDirty) {
-      await saveLayout(siteId, layout);
-      setIsDirty(false);
-    }
-  }, [isDirty, siteId, layout]);
-
   return {
     layout,
-    mode,
-    selectedId,
+    interaction,
     pendingPlantId,
     isDirty,
     saving,
-    setMode: handleSetMode,
-    select: handleSelect,
+    canUndo,
+    // Undo
+    undo,
+    pushUndo,
+    // Interaction
+    deselect,
+    selectArea,
+    selectPoint,
+    fixPoint,
+    toggleMeasure,
+    setMeasureEdge,
+    applyEdgeLength,
     setPendingPlantId,
     // Areas
     addArea: handleAddArea,
     removeArea: handleRemoveArea,
-    moveArea: handleMoveArea,
-    updateAreaPoint: handleUpdateAreaPoint,
-    updateAreaLabel: handleUpdateAreaLabel,
+    moveAreaPoint: handleMoveAreaPoint,
+    commitPointMove: handleCommitPointMove,
     insertAreaPoint: handleInsertAreaPoint,
+    updateAreaLabel: handleUpdateAreaLabel,
     resizeArea: handleResizeArea,
     setAreaVisibility: handleSetAreaVisibility,
     // Plants
@@ -261,11 +383,5 @@ export function useGardenLayoutState(
     removeMarker: handleRemoveMarker,
     moveMarker: handleMoveMarker,
     rotateMarker: handleRotateMarker,
-    // Misc
-    forceSave,
-    setLayout: (l: GardenLayout) => {
-      setLayout(l);
-      setIsDirty(true);
-    },
   };
 }

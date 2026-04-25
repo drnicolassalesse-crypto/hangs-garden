@@ -1,189 +1,123 @@
-import type { EditorMode } from './useGardenLayoutState';
-import type { UUID } from '../../domain/types';
+import type { InteractionState } from './useGardenLayoutState';
 import { t } from '../../i18n';
 
 interface LayoutToolbarProps {
-  mode: EditorMode;
-  selectedId: UUID | null;
+  interaction: InteractionState;
+  canUndo: boolean;
   saving: boolean;
-  hasPlants: boolean;
-  hasAreas: boolean;
-  onSetMode: (mode: EditorMode) => void;
+  onUndo: () => void;
   onAddArea: () => void;
-  onDeleteSelected: () => void;
   onOpenPalette: () => void;
   onAddMarker: () => void;
   onOpenObjectList: () => void;
+  onToggleMeasure: () => void;
+  onDeleteSelected: () => void;
 }
 
 export function LayoutToolbar({
-  mode,
-  selectedId,
+  interaction,
+  canUndo,
   saving,
-  hasPlants,
-  hasAreas,
-  onSetMode,
+  onUndo,
   onAddArea,
-  onDeleteSelected,
   onOpenPalette,
   onAddMarker,
   onOpenObjectList,
+  onToggleMeasure,
+  onDeleteSelected,
 }: LayoutToolbarProps) {
-  if (mode === 'view') {
-    return (
-      <div className="flex items-center justify-between px-4 py-3">
-        <span className="text-xs text-ink-muted">
-          {saving
-            ? t('gardenLayout.saving')
-            : t('gardenLayout.canvas.pinchHint')}
-        </span>
-        <button
-          type="button"
-          onClick={() => onSetMode('edit_areas')}
-          className="rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-white active:scale-[0.98]"
-        >
-          {t('gardenLayout.toolbar.edit')}
-        </button>
-      </div>
-    );
-  }
+  const hasSelection =
+    interaction.kind === 'area_selected' ||
+    interaction.kind === 'point_selected';
+  const isMeasuring = interaction.kind === 'measure';
 
   return (
-    <div className="flex flex-col gap-2 px-4 py-3">
-      {/* Mode tabs */}
-      <div className="flex gap-1 rounded-full bg-surface p-1">
-        <ModeTab
-          label={t('gardenLayout.toolbar.areas')}
-          isActive={mode === 'edit_areas'}
-          onClick={() => onSetMode('edit_areas')}
-        />
-        <ModeTab
-          label={t('gardenLayout.toolbar.plants')}
-          isActive={mode === 'place_plants'}
-          onClick={() => onSetMode('place_plants')}
-        />
-        <ModeTab
-          label={t('gardenLayout.toolbar.markers')}
-          isActive={mode === 'place_markers'}
-          onClick={() => onSetMode('place_markers')}
-        />
-      </div>
+    <div className="flex items-center gap-1.5 overflow-x-auto px-3 py-2.5">
+      {/* Undo */}
+      <ToolBtn
+        onClick={onUndo}
+        disabled={!canUndo}
+        label={t('gardenLayout.toolbar.undo')}
+      />
 
-      {/* Contextual actions */}
-      <div className="flex items-center gap-2">
-        {mode === 'edit_areas' && (
-          <>
-            <button
-              type="button"
-              onClick={onAddArea}
-              className="rounded-full bg-primary/10 px-3 py-2 text-sm font-medium text-primary active:scale-[0.98]"
-            >
-              {t('gardenLayout.toolbar.addArea')}
-            </button>
-            {hasAreas && (
-              <button
-                type="button"
-                onClick={onOpenObjectList}
-                className="rounded-full bg-primary/10 px-3 py-2 text-sm font-medium text-primary active:scale-[0.98]"
-              >
-                {t('gardenLayout.toolbar.objectList')}
-              </button>
-            )}
-            {selectedId && (
-              <button
-                type="button"
-                onClick={onDeleteSelected}
-                className="rounded-full bg-overdue/10 px-3 py-2 text-sm font-medium text-overdue active:scale-[0.98]"
-              >
-                {t('gardenLayout.toolbar.deleteArea')}
-              </button>
-            )}
-          </>
-        )}
+      <Divider />
 
-        {mode === 'place_plants' && (
-          <>
-            <button
-              type="button"
-              onClick={onOpenPalette}
-              className="rounded-full bg-primary/10 px-3 py-2 text-sm font-medium text-primary active:scale-[0.98]"
-            >
-              {t('gardenLayout.toolbar.placePlants')}
-            </button>
-            {selectedId && (
-              <button
-                type="button"
-                onClick={onDeleteSelected}
-                className="rounded-full bg-overdue/10 px-3 py-2 text-sm font-medium text-overdue active:scale-[0.98]"
-              >
-                {t('common.remove')}
-              </button>
-            )}
-            {!hasPlants && (
-              <span className="text-xs text-ink-muted">
-                {t('gardenLayout.toolbar.noPlantsHint')}
-              </span>
-            )}
-          </>
-        )}
+      {/* Add actions */}
+      <ToolBtn onClick={onAddArea} label={t('gardenLayout.toolbar.addArea')} />
+      <ToolBtn
+        onClick={onOpenPalette}
+        label={t('gardenLayout.toolbar.placePlants')}
+      />
+      <ToolBtn onClick={onAddMarker} label={t('gardenLayout.toolbar.addMarker')} />
 
-        {mode === 'place_markers' && (
-          <>
-            <button
-              type="button"
-              onClick={onAddMarker}
-              className="rounded-full bg-primary/10 px-3 py-2 text-sm font-medium text-primary active:scale-[0.98]"
-            >
-              {t('gardenLayout.toolbar.addMarker')}
-            </button>
-            {selectedId && (
-              <button
-                type="button"
-                onClick={onDeleteSelected}
-                className="rounded-full bg-overdue/10 px-3 py-2 text-sm font-medium text-overdue active:scale-[0.98]"
-              >
-                {t('gardenLayout.toolbar.deleteMarker')}
-              </button>
-            )}
-          </>
-        )}
+      <Divider />
 
-        <span className="flex-1" />
-        {saving && (
-          <span className="text-xs text-ink-muted">
-            {t('gardenLayout.saving')}
-          </span>
-        )}
-        <button
-          type="button"
-          onClick={() => onSetMode('view')}
-          className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-white active:scale-[0.98]"
-        >
-          {t('gardenLayout.toolbar.done')}
-        </button>
-      </div>
+      {/* Object list */}
+      <ToolBtn
+        onClick={onOpenObjectList}
+        label={t('gardenLayout.toolbar.objectList')}
+      />
+
+      {/* Dimension mode */}
+      <ToolBtn
+        onClick={onToggleMeasure}
+        label={t('gardenLayout.toolbar.dimension')}
+        active={isMeasuring}
+      />
+
+      {/* Delete (only when something selected) */}
+      {hasSelection && (
+        <>
+          <Divider />
+          <ToolBtn
+            onClick={onDeleteSelected}
+            label={t('gardenLayout.toolbar.deleteArea')}
+            danger
+          />
+        </>
+      )}
+
+      {/* Saving indicator */}
+      {saving && (
+        <span className="ml-auto text-xs text-ink-muted">
+          {t('gardenLayout.saving')}
+        </span>
+      )}
     </div>
   );
 }
 
-function ModeTab({
-  label,
-  isActive,
+function ToolBtn({
   onClick,
+  label,
+  disabled,
+  active,
+  danger,
 }: {
-  label: string;
-  isActive: boolean;
   onClick: () => void;
+  label: string;
+  disabled?: boolean;
+  active?: boolean;
+  danger?: boolean;
 }) {
+  let cls =
+    'whitespace-nowrap rounded-full px-3 py-2 text-xs font-medium active:scale-[0.98] transition-colors';
+  if (danger) {
+    cls += ' bg-overdue/10 text-overdue';
+  } else if (active) {
+    cls += ' bg-primary text-white';
+  } else if (disabled) {
+    cls += ' bg-black/5 text-ink-muted opacity-40';
+  } else {
+    cls += ' bg-primary/10 text-primary';
+  }
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`flex-1 rounded-full px-3 py-2 text-center text-xs font-medium transition-colors ${
-        isActive ? 'bg-white text-primary shadow-sm' : 'text-ink-muted'
-      }`}
-    >
+    <button type="button" onClick={onClick} disabled={disabled} className={cls}>
       {label}
     </button>
   );
+}
+
+function Divider() {
+  return <span className="mx-0.5 h-5 w-px bg-black/10" />;
 }

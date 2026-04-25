@@ -480,17 +480,23 @@ const vi: Record<string, string> = {
   'gardenLayout.saved': '\u0110\u00E3 l\u01B0u',
 
   // Toolbar
-  'gardenLayout.toolbar.edit': 'S\u1EEDa',
-  'gardenLayout.toolbar.done': 'Xong',
+  'gardenLayout.toolbar.undo': 'Ho\u00E0n t\u00E1c',
   'gardenLayout.toolbar.addArea': '+ Khu v\u1EF1c',
-  'gardenLayout.toolbar.deleteArea': 'X\u00F3a khu v\u1EF1c',
-  'gardenLayout.toolbar.deleteMarker': 'X\u00F3a',
-  'gardenLayout.toolbar.areas': 'Khu v\u1EF1c',
-  'gardenLayout.toolbar.plants': 'C\u00E2y',
-  'gardenLayout.toolbar.markers': '\u0110\u00E1nh d\u1EA5u',
-  'gardenLayout.toolbar.placePlants': '\u0110\u1EB7t c\u00E2y',
+  'gardenLayout.toolbar.deleteArea': 'X\u00F3a',
+  'gardenLayout.toolbar.placePlants': 'C\u00E2y',
   'gardenLayout.toolbar.addMarker': '+ \u0110\u00E1nh d\u1EA5u',
   'gardenLayout.toolbar.objectList': 'Danh s\u00E1ch',
+  'gardenLayout.toolbar.dimension': '\u0110o',
+
+  // Interaction hints
+  'gardenLayout.hint.idle': 'Ch\u1EA1m \u0111\u00FAp v\u00E0o khu v\u1EF1c \u0111\u1EC3 ch\u1ECDn. K\u00E9o \u0111\u1EC3 di chuy\u1EC3n.',
+  'gardenLayout.hint.areaSelected': 'Ch\u1EA1m \u0111\u00FAp \u0111i\u1EC3m \u0111\u1EC3 di chuy\u1EC3n. Ch\u1EA1m \u0111\u00FAp c\u1EA1nh \u0111\u1EC3 th\u00EAm \u0111i\u1EC3m.',
+  'gardenLayout.hint.pointSelected': 'K\u00E9o \u0111i\u1EC3m. Ch\u1EA1m \u0111\u00FAp khu v\u1EF1c \u0111\u1EC3 c\u1ED1 \u0111\u1ECBnh.',
+  'gardenLayout.hint.measure': 'Ch\u1EA1m \u0111\u00FAp c\u1EA1nh \u0111\u1EC3 \u0111o. Nh\u1EADp chi\u1EC1u d\u00E0i m\u1EDBi \u0111\u1EC3 thay \u0111\u1ED5i.',
+
+  // Measure panel
+  'gardenLayout.measure.edge': 'C\u1EA1nh {{n}}',
+  'gardenLayout.measure.apply': '\u00C1p d\u1EE5ng',
 
   // Shape picker
   'gardenLayout.shapePicker.heading': 'Th\u00EAm khu v\u1EF1c',

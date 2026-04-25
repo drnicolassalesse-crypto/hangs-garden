@@ -480,17 +480,23 @@ const en: Record<string, string> = {
   'gardenLayout.saved': 'Saved',
 
   // Toolbar
-  'gardenLayout.toolbar.edit': 'Edit',
-  'gardenLayout.toolbar.done': 'Done',
+  'gardenLayout.toolbar.undo': 'Undo',
   'gardenLayout.toolbar.addArea': '+ Area',
-  'gardenLayout.toolbar.deleteArea': 'Delete area',
-  'gardenLayout.toolbar.deleteMarker': 'Delete',
-  'gardenLayout.toolbar.areas': 'Areas',
-  'gardenLayout.toolbar.plants': 'Plants',
-  'gardenLayout.toolbar.markers': 'Markers',
-  'gardenLayout.toolbar.placePlants': 'Place plants',
+  'gardenLayout.toolbar.deleteArea': 'Delete',
+  'gardenLayout.toolbar.placePlants': 'Plants',
   'gardenLayout.toolbar.addMarker': '+ Marker',
   'gardenLayout.toolbar.objectList': 'List',
+  'gardenLayout.toolbar.dimension': 'Measure',
+
+  // Interaction hints
+  'gardenLayout.hint.idle': 'Double-tap an area to select it. Drag to pan.',
+  'gardenLayout.hint.areaSelected': 'Double-tap a point to move it. Double-tap edge to add point.',
+  'gardenLayout.hint.pointSelected': 'Drag the point. Double-tap area to fix it.',
+  'gardenLayout.hint.measure': 'Double-tap an edge to measure. Enter new length to resize.',
+
+  // Measure panel
+  'gardenLayout.measure.edge': 'Edge {{n}}',
+  'gardenLayout.measure.apply': 'Apply',
 
   // Shape picker
   'gardenLayout.shapePicker.heading': 'Add an area',

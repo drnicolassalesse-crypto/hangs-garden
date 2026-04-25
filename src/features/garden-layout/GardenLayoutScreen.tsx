@@ -13,6 +13,7 @@ import { t } from '../../i18n';
 import { useGardenLayoutState } from './useGardenLayoutState';
 import { GardenCanvas } from './GardenCanvas';
 import { LayoutToolbar } from './LayoutToolbar';
+import { MeasurePanel } from './MeasurePanel';
 import { AreaShapePicker } from './AreaShapePicker';
 import { PlantPalette } from './PlantPalette';
 import { MarkerPicker } from './MarkerPicker';
@@ -37,6 +38,14 @@ export function GardenLayoutScreen() {
       navigate('/sites', { replace: true });
       return;
     }
+
+    // Ensure layout exists
+    if (!mine.layout) {
+      const empty = emptyLayout();
+      await saveLayout(mine.id, empty);
+      mine.layout = empty;
+    }
+
     setSite(mine);
 
     const [pots, tasks, species] = await Promise.all([
@@ -54,7 +63,7 @@ export function GardenLayoutScreen() {
     });
     setSummaries(plantSummaries);
 
-    // Lazy cleanup: remove placements for deleted/moved pots
+    // Lazy cleanup
     if (mine.layout) {
       const existingIds = new Set(pots.map((p) => p.id));
       const cleaned = cleanupDeletedPots(mine.layout, existingIds);
@@ -71,26 +80,17 @@ export function GardenLayoutScreen() {
     void load();
   }, [load]);
 
-  // Initialize layout state once site is loaded
+  // Initialize state AFTER site loaded (no race condition)
   const initialLayout = site?.layout ?? null;
   const state = useGardenLayoutState(siteId as UUID, initialLayout);
 
-  // If no layout exists yet, create an empty one
-  useEffect(() => {
-    if (site && !site.layout && !loading) {
-      const empty = emptyLayout();
-      void saveLayout(site.id, empty);
-      site.layout = empty;
-    }
-  }, [site, loading]);
-
-  // Bottom sheet visibility
+  // Bottom sheets
   const [showShapePicker, setShowShapePicker] = useState(false);
   const [showPalette, setShowPalette] = useState(false);
   const [showMarkerPicker, setShowMarkerPicker] = useState(false);
   const [showObjectList, setShowObjectList] = useState(false);
 
-  // Auto-start in edit mode and open shape picker when layout is empty
+  // Auto-open shape picker for empty layouts
   const layoutIsEmpty =
     state.layout.areas.length === 0 &&
     state.layout.plant_placements.length === 0;
@@ -98,19 +98,17 @@ export function GardenLayoutScreen() {
   useEffect(() => {
     if (!loading && layoutIsEmpty && !didAutoOpen.current) {
       didAutoOpen.current = true;
-      state.setMode('edit_areas');
-      // Small delay so the toolbar renders first
       setTimeout(() => setShowShapePicker(true), 300);
     }
-  }, [loading, layoutIsEmpty, state]);
+  }, [loading, layoutIsEmpty]);
 
-  // Plant summaries as a map for the canvas
+  // Summaries map for canvas
   const summaryMap = useMemo(
     () => new Map(summaries.map((s) => [s.pot.id, s])),
     [summaries],
   );
 
-  // Unplaced plants for the palette
+  // Unplaced plants
   const placedPotIds = useMemo(
     () => new Set(state.layout.plant_placements.map((p) => p.pot_id)),
     [state.layout.plant_placements],
@@ -120,7 +118,67 @@ export function GardenLayoutScreen() {
     [summaries, placedPotIds],
   );
 
-  // Canvas tap handler: place pending plant or deselect
+  // ── Interaction handlers ─────────────────────────────
+
+  const handleDblTapArea = useCallback(
+    (areaId: UUID) => {
+      if (state.interaction.kind === 'measure') {
+        // In measure mode, double-tap on area selects it to show edge lengths
+        state.selectArea(areaId);
+        return;
+      }
+      if (
+        state.interaction.kind === 'point_selected' &&
+        state.interaction.areaId === areaId
+      ) {
+        // Fix the point
+        state.fixPoint();
+        return;
+      }
+      state.selectArea(areaId);
+    },
+    [state],
+  );
+
+  const handleDblTapHandle = useCallback(
+    (areaId: UUID, pointIndex: number) => {
+      if (state.interaction.kind === 'point_selected') {
+        // Already have a point selected — fix it first, then select new
+        state.fixPoint();
+      }
+      // Push undo before entering point-select (so undo restores original)
+      state.pushUndo();
+      state.selectPoint(areaId, pointIndex);
+    },
+    [state],
+  );
+
+  const handleDblTapEdge = useCallback(
+    (areaId: UUID, afterIndex: number, point: { x: number; y: number }) => {
+      if (state.interaction.kind === 'measure') {
+        state.setMeasureEdge(areaId, afterIndex);
+        return;
+      }
+      // Insert new point
+      state.insertAreaPoint(areaId, afterIndex, point);
+    },
+    [state],
+  );
+
+  const handleDragPoint = useCallback(
+    (areaId: UUID, pointIndex: number, point: { x: number; y: number }) => {
+      state.moveAreaPoint(areaId, pointIndex, point);
+    },
+    [state],
+  );
+
+  const handleDragPointEnd = useCallback(
+    (areaId: UUID, pointIndex: number, point: { x: number; y: number }) => {
+      state.moveAreaPoint(areaId, pointIndex, point);
+    },
+    [state],
+  );
+
   const handleCanvasTap = useCallback(
     (x: number, y: number) => {
       if (state.pendingPlantId) {
@@ -130,7 +188,6 @@ export function GardenLayoutScreen() {
     [state],
   );
 
-  // Plant icon tap in view mode -> navigate to detail
   const handlePlantTap = useCallback(
     (potId: UUID) => {
       navigate(`/plants/${potId}`);
@@ -138,19 +195,18 @@ export function GardenLayoutScreen() {
     [navigate],
   );
 
-  // Delete selected item based on current mode
+  const handleDblTapEmpty = useCallback(() => {
+    state.deselect();
+  }, [state]);
+
   const handleDeleteSelected = useCallback(() => {
-    if (!state.selectedId) return;
-    if (state.mode === 'edit_areas') {
-      state.removeArea(state.selectedId);
-    } else if (state.mode === 'place_plants') {
-      state.removePlant(state.selectedId);
-    } else if (state.mode === 'place_markers') {
-      state.removeMarker(state.selectedId);
+    if (state.interaction.kind === 'area_selected') {
+      state.removeArea(state.interaction.areaId);
+    } else if (state.interaction.kind === 'point_selected') {
+      state.removeArea(state.interaction.areaId);
     }
   }, [state]);
 
-  // Add marker at center of canvas
   const handleAddMarker = useCallback(
     (type: 'water_source' | 'compass') => {
       state.addMarker(
@@ -170,8 +226,11 @@ export function GardenLayoutScreen() {
     );
   }
 
-  const hasAreas = state.layout.areas.length > 0;
-  const hasPlants = state.layout.plant_placements.length > 0;
+  const isMeasuring = state.interaction.kind === 'measure';
+  const measureEdge =
+    isMeasuring && 'activeEdge' in state.interaction
+      ? state.interaction.activeEdge ?? null
+      : null;
 
   return (
     <main className="flex h-screen flex-col bg-surface">
@@ -197,74 +256,47 @@ export function GardenLayoutScreen() {
         )}
       </header>
 
-      {/* Step guide banner (only in edit modes when layout is sparse) */}
-      {state.mode !== 'view' && (
-        <div className="flex items-center gap-3 bg-primary/5 px-4 py-2">
-          <StepBadge n={1} active={state.mode === 'edit_areas'} done={hasAreas}>
-            {t('gardenLayout.toolbar.areas')}
-          </StepBadge>
-          <span className="text-ink-muted">&rsaquo;</span>
-          <StepBadge
-            n={2}
-            active={state.mode === 'place_plants'}
-            done={hasPlants}
-          >
-            {t('gardenLayout.toolbar.plants')}
-          </StepBadge>
-          <span className="text-ink-muted">&rsaquo;</span>
-          <StepBadge n={3} active={state.mode === 'place_markers'} done={false}>
-            {t('gardenLayout.toolbar.markers')}
-          </StepBadge>
-        </div>
-      )}
+      {/* Interaction hint */}
+      <div className="bg-primary/5 px-4 py-1.5 text-center text-[11px] text-ink-muted">
+        {state.interaction.kind === 'idle' && t('gardenLayout.hint.idle')}
+        {state.interaction.kind === 'area_selected' &&
+          t('gardenLayout.hint.areaSelected')}
+        {state.interaction.kind === 'point_selected' &&
+          t('gardenLayout.hint.pointSelected')}
+        {state.interaction.kind === 'measure' &&
+          t('gardenLayout.hint.measure')}
+      </div>
 
-      {/* Canvas (fills available space) */}
+      {/* Canvas */}
       <div className="relative flex-1">
         <GardenCanvas
           layout={state.layout}
           plantSummaries={summaryMap}
-          mode={state.mode}
-          selectedId={state.selectedId}
-          onAreaMove={state.moveArea}
-          onAreaPointMove={state.updateAreaPoint}
-          onAreaInsertPoint={state.insertAreaPoint}
-          onPlantMove={state.movePlant}
+          interaction={state.interaction}
+          onDblTapArea={handleDblTapArea}
+          onDblTapHandle={handleDblTapHandle}
+          onDblTapEdge={handleDblTapEdge}
+          onDragPoint={handleDragPoint}
+          onDragPointEnd={handleDragPointEnd}
           onPlantTap={handlePlantTap}
           onCanvasTap={handleCanvasTap}
-          onMarkerMove={state.moveMarker}
-          onMarkerRotate={state.rotateMarker}
-          onSelect={state.select}
+          onDblTapEmpty={handleDblTapEmpty}
         />
 
-        {/* Empty state overlay */}
-        {layoutIsEmpty && state.mode === 'view' && (
+        {/* Empty state */}
+        {layoutIsEmpty && (
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
             <p className="text-4xl">{'\u{1F33F}'}</p>
             <p className="mt-2 text-sm font-medium text-ink">
               {t('gardenLayout.empty.title')}
             </p>
-            <p className="mt-1 text-xs text-ink-muted">
-              {t('gardenLayout.empty.subtitle')}
-            </p>
             <button
               type="button"
-              onClick={() => {
-                state.setMode('edit_areas');
-                setShowShapePicker(true);
-              }}
-              className="pointer-events-auto mt-4 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-white active:scale-[0.98]"
+              onClick={() => setShowShapePicker(true)}
+              className="pointer-events-auto mt-3 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-white active:scale-[0.98]"
             >
               {t('gardenLayout.empty.start')}
             </button>
-          </div>
-        )}
-
-        {/* Empty canvas hint in edit mode with no areas */}
-        {!hasAreas && state.mode === 'edit_areas' && !showShapePicker && (
-          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <p className="text-sm text-ink-muted">
-              {t('gardenLayout.empty.tapAddArea')}
-            </p>
           </div>
         )}
       </div>
@@ -283,20 +315,28 @@ export function GardenLayoutScreen() {
         </div>
       )}
 
+      {/* Measure panel */}
+      {measureEdge && (
+        <MeasurePanel
+          edgeIndex={measureEdge.edgeIndex}
+          lengthCm={measureEdge.lengthCm}
+          onApply={state.applyEdgeLength}
+        />
+      )}
+
       {/* Toolbar */}
       <div className="bg-card shadow-[0_-2px_8px_rgba(0,0,0,0.06)]">
         <LayoutToolbar
-          mode={state.mode}
-          selectedId={state.selectedId}
+          interaction={state.interaction}
+          canUndo={state.canUndo}
           saving={state.saving}
-          hasPlants={summaries.length > 0}
-          hasAreas={hasAreas}
-          onSetMode={state.setMode}
+          onUndo={state.undo}
           onAddArea={() => setShowShapePicker(true)}
-          onDeleteSelected={handleDeleteSelected}
           onOpenPalette={() => setShowPalette(true)}
           onAddMarker={() => setShowMarkerPicker(true)}
           onOpenObjectList={() => setShowObjectList(true)}
+          onToggleMeasure={state.toggleMeasure}
+          onDeleteSelected={handleDeleteSelected}
         />
       </div>
 
@@ -336,9 +376,15 @@ export function GardenLayoutScreen() {
       {showObjectList && (
         <ObjectListPanel
           areas={state.layout.areas}
-          selectedId={state.selectedId}
+          selectedId={
+            state.interaction.kind === 'area_selected'
+              ? state.interaction.areaId
+              : state.interaction.kind === 'point_selected'
+                ? state.interaction.areaId
+                : null
+          }
           onSelect={(id) => {
-            state.select(id);
+            state.selectArea(id);
             setShowObjectList(false);
           }}
           onToggleVisibility={state.setAreaVisibility}
@@ -348,43 +394,5 @@ export function GardenLayoutScreen() {
         />
       )}
     </main>
-  );
-}
-
-/** Small step badge for the guided workflow banner */
-function StepBadge({
-  n,
-  active,
-  done,
-  children,
-}: {
-  n: number;
-  active: boolean;
-  done: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <span
-      className={`flex items-center gap-1.5 text-xs font-medium ${
-        active
-          ? 'text-primary'
-          : done
-            ? 'text-success'
-            : 'text-ink-muted'
-      }`}
-    >
-      <span
-        className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
-          active
-            ? 'bg-primary text-white'
-            : done
-              ? 'bg-success/20 text-success'
-              : 'bg-black/5 text-ink-muted'
-        }`}
-      >
-        {done ? '\u2713' : n}
-      </span>
-      {children}
-    </span>
   );
 }
