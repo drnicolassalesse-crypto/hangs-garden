@@ -8,7 +8,7 @@ import {
 } from '../../data/repositories';
 import { summarizePlants, type PlantSummary } from '../../domain/plantSummary';
 import { cleanupDeletedPots, emptyLayout } from '../../domain/gardenLayout';
-import type { GardenLayout, Site, UUID } from '../../domain/types';
+import type { Site, UUID } from '../../domain/types';
 import { t } from '../../i18n';
 import { useGardenLayoutState } from './useGardenLayoutState';
 import { GardenCanvas } from './GardenCanvas';
@@ -184,7 +184,6 @@ export function GardenLayoutScreen() {
         plantSummaries={summaryMap}
         mode={state.mode}
         selectedId={state.selectedId}
-        pendingPlantId={state.pendingPlantId}
         onAreaMove={state.moveArea}
         onAreaPointMove={state.updateAreaPoint}
         onPlantMove={state.movePlant}

@@ -14,7 +14,6 @@ interface GardenCanvasProps {
   plantSummaries: Map<UUID, PlantSummary>;
   mode: EditorMode;
   selectedId: UUID | null;
-  pendingPlantId: UUID | null;
   onAreaMove: (areaId: UUID, x: number, y: number) => void;
   onAreaPointMove: (
     areaId: UUID,
@@ -49,7 +48,6 @@ export function GardenCanvas({
   plantSummaries,
   mode,
   selectedId,
-  pendingPlantId,
   onAreaMove,
   onAreaPointMove,
   onPlantMove,
