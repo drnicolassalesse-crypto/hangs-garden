@@ -259,7 +259,11 @@ export const GardenCanvas = forwardRef<GardenCanvasHandle, GardenCanvasProps>(
       : null;
 
   return (
-    <div ref={containerRef} className="flex-1 overflow-hidden bg-surface">
+    <div
+      ref={containerRef}
+      className="absolute inset-0 overflow-hidden bg-surface"
+      style={{ touchAction: 'none' }}
+    >
       <Stage
         ref={stageRef}
         width={size.width}

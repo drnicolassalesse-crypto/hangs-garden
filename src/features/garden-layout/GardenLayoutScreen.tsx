@@ -235,7 +235,10 @@ export function GardenLayoutScreen() {
       : null;
 
   return (
-    <main className="flex h-[100dvh] flex-col overflow-hidden bg-surface">
+    <main
+      className="flex h-[100dvh] flex-col overflow-hidden bg-surface"
+      style={{ touchAction: 'none' }}
+    >
       {/* Header */}
       <header className="flex items-center gap-3 bg-card px-4 py-3 shadow-sm">
         <NavLink

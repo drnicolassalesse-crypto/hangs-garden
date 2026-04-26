@@ -31,7 +31,7 @@ export function LayoutToolbar({
     interaction.kind === 'point_selected';
 
   return (
-    <div className="flex items-center gap-1.5 overflow-x-auto px-3 py-2.5">
+    <div className="flex flex-wrap items-center gap-1.5 px-3 py-2">
       {/* Undo */}
       <ToolBtn
         onClick={onUndo}
