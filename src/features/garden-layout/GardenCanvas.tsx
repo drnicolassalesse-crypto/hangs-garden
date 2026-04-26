@@ -17,6 +17,7 @@ interface GardenCanvasProps {
   onDblTapArea: (areaId: UUID) => void;
   onDblTapHandle: (areaId: UUID, pointIndex: number) => void;
   onDblTapEdge: (areaId: UUID, afterIndex: number, point: LayoutPoint) => void;
+  onTapEdge: (areaId: UUID, edgeIndex: number) => void;
   onDragPoint: (areaId: UUID, pointIndex: number, point: LayoutPoint) => void;
   onDragPointEnd: (areaId: UUID, pointIndex: number, point: LayoutPoint) => void;
   // Plant/marker
@@ -49,6 +50,7 @@ export function GardenCanvas({
   onDblTapArea,
   onDblTapHandle,
   onDblTapEdge,
+  onTapEdge,
   onDragPoint,
   onDragPointEnd,
   onPlantTap,
@@ -182,7 +184,11 @@ export function GardenCanvas({
   const selectedPointIndex =
     interaction.kind === 'point_selected' ? interaction.pointIndex : null;
 
-  const isMeasuring = interaction.kind === 'measure';
+  const selectedEdge =
+    (interaction.kind === 'idle' || interaction.kind === 'area_selected') &&
+    interaction.selectedEdge
+      ? interaction.selectedEdge
+      : null;
 
   return (
     <div ref={containerRef} className="flex-1 overflow-hidden bg-surface">
@@ -220,10 +226,15 @@ export function GardenCanvas({
               selectedPointIndex={
                 selectedAreaId === area.id ? selectedPointIndex : null
               }
-              isMeasuring={isMeasuring}
+              selectedEdgeIndex={
+                selectedEdge && selectedEdge.areaId === area.id
+                  ? selectedEdge.edgeIndex
+                  : null
+              }
               onDblTapArea={() => onDblTapArea(area.id)}
               onDblTapHandle={(idx) => onDblTapHandle(area.id, idx)}
               onDblTapEdge={(afterIdx, pt) => onDblTapEdge(area.id, afterIdx, pt)}
+              onTapEdge={(idx) => onTapEdge(area.id, idx)}
               onDragPoint={(idx, pt) => onDragPoint(area.id, idx, pt)}
               onDragPointEnd={(idx, pt) => onDragPointEnd(area.id, idx, pt)}
             />

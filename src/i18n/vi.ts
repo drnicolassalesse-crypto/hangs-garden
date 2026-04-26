@@ -492,11 +492,13 @@ const vi: Record<string, string> = {
   'gardenLayout.hint.idle': 'Ch\u1EA1m \u0111\u00FAp v\u00E0o khu v\u1EF1c \u0111\u1EC3 ch\u1ECDn. K\u00E9o \u0111\u1EC3 di chuy\u1EC3n.',
   'gardenLayout.hint.areaSelected': 'Ch\u1EA1m \u0111\u00FAp \u0111i\u1EC3m \u0111\u1EC3 di chuy\u1EC3n. Ch\u1EA1m \u0111\u00FAp c\u1EA1nh \u0111\u1EC3 th\u00EAm \u0111i\u1EC3m.',
   'gardenLayout.hint.pointSelected': 'K\u00E9o \u0111i\u1EC3m. Ch\u1EA1m \u0111\u00FAp khu v\u1EF1c \u0111\u1EC3 c\u1ED1 \u0111\u1ECBnh.',
-  'gardenLayout.hint.measure': 'Ch\u1EA1m \u0111\u00FAp c\u1EA1nh \u0111\u1EC3 \u0111o. Nh\u1EADp chi\u1EC1u d\u00E0i m\u1EDBi \u0111\u1EC3 thay \u0111\u1ED5i.',
+  'gardenLayout.hint.edgeSelected': 'C\u1EA1nh \u0111\u01B0\u1EE3c ch\u1ECDn. Thay \u0111\u1ED5i k\u00EDch th\u01B0\u1EDBc v\u00E0 nh\u1EA5n K\u00EDch ho\u1EA1t.',
 
-  // Measure panel
+  // Dimension field
+  'gardenLayout.measure.label': 'K\u00EDch th\u01B0\u1EDBc',
+  'gardenLayout.measure.placeholder': 'Ch\u1EA1m c\u1EA1nh',
   'gardenLayout.measure.edge': 'C\u1EA1nh {{n}}',
-  'gardenLayout.measure.apply': '\u00C1p d\u1EE5ng',
+  'gardenLayout.measure.activate': 'K\u00EDch ho\u1EA1t',
 
   // Shape picker
   'gardenLayout.shapePicker.heading': 'Th\u00EAm khu v\u1EF1c',

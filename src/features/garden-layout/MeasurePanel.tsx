@@ -1,15 +1,25 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { t } from '../../i18n';
 import { TextInput } from '../../ui/Field';
 
 interface MeasurePanelProps {
-  edgeIndex: number;
-  lengthCm: number;
+  /** null when no edge is selected */
+  edgeIndex: number | null;
+  lengthCm: number | null;
   onApply: (newLengthCm: number) => void;
 }
 
 export function MeasurePanel({ edgeIndex, lengthCm, onApply }: MeasurePanelProps) {
-  const [draft, setDraft] = useState(String(lengthCm));
+  const [draft, setDraft] = useState('');
+
+  // Sync draft when a new edge is selected
+  useEffect(() => {
+    if (lengthCm !== null) {
+      setDraft(String(lengthCm));
+    }
+  }, [lengthCm, edgeIndex]);
+
+  const hasEdge = edgeIndex !== null && lengthCm !== null;
 
   function handleApply() {
     const v = parseFloat(draft);
@@ -17,26 +27,32 @@ export function MeasurePanel({ edgeIndex, lengthCm, onApply }: MeasurePanelProps
   }
 
   return (
-    <div className="flex items-center gap-2 bg-primary/5 px-4 py-2">
-      <span className="text-xs font-medium text-ink-muted">
-        {t('gardenLayout.measure.edge', { n: String(edgeIndex + 1) })}
+    <div className="flex items-center gap-2 border-t border-black/5 bg-card px-3 py-2">
+      <span className="shrink-0 text-xs font-medium text-ink-muted">
+        {t('gardenLayout.measure.label')}
       </span>
-      <div className="flex items-center gap-1">
-        <TextInput
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          inputMode="decimal"
-          className="w-20 text-center text-sm"
-        />
-        <span className="text-xs text-ink-muted">cm</span>
-      </div>
+      <TextInput
+        value={hasEdge ? draft : ''}
+        onChange={(e) => setDraft(e.target.value)}
+        placeholder={hasEdge ? '' : t('gardenLayout.measure.placeholder')}
+        inputMode="decimal"
+        disabled={!hasEdge}
+        className="w-20 text-center text-sm"
+      />
+      <span className="text-xs text-ink-muted">cm</span>
       <button
         type="button"
         onClick={handleApply}
-        className="rounded-full bg-primary px-3 py-1 text-xs font-medium text-white active:scale-[0.98]"
+        disabled={!hasEdge || !draft}
+        className="shrink-0 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-white disabled:opacity-40 active:scale-[0.98]"
       >
-        {t('gardenLayout.measure.apply')}
+        {t('gardenLayout.measure.activate')}
       </button>
+      {hasEdge && (
+        <span className="text-[10px] text-ink-muted">
+          {t('gardenLayout.measure.edge', { n: String(edgeIndex + 1) })}
+        </span>
+      )}
     </div>
   );
 }

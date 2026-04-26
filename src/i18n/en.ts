@@ -492,11 +492,13 @@ const en: Record<string, string> = {
   'gardenLayout.hint.idle': 'Double-tap an area to select it. Drag to pan.',
   'gardenLayout.hint.areaSelected': 'Double-tap a point to move it. Double-tap edge to add point.',
   'gardenLayout.hint.pointSelected': 'Drag the point. Double-tap area to fix it.',
-  'gardenLayout.hint.measure': 'Double-tap an edge to measure. Enter new length to resize.',
+  'gardenLayout.hint.edgeSelected': 'Edge selected. Change dimension below and tap Activate.',
 
-  // Measure panel
+  // Dimension field
+  'gardenLayout.measure.label': 'Dimension',
+  'gardenLayout.measure.placeholder': 'Tap an edge',
   'gardenLayout.measure.edge': 'Edge {{n}}',
-  'gardenLayout.measure.apply': 'Apply',
+  'gardenLayout.measure.activate': 'Activate',
 
   // Shape picker
   'gardenLayout.shapePicker.heading': 'Add an area',

@@ -122,11 +122,6 @@ export function GardenLayoutScreen() {
 
   const handleDblTapArea = useCallback(
     (areaId: UUID) => {
-      if (state.interaction.kind === 'measure') {
-        // In measure mode, double-tap on area selects it to show edge lengths
-        state.selectArea(areaId);
-        return;
-      }
       if (
         state.interaction.kind === 'point_selected' &&
         state.interaction.areaId === areaId
@@ -155,12 +150,16 @@ export function GardenLayoutScreen() {
 
   const handleDblTapEdge = useCallback(
     (areaId: UUID, afterIndex: number, point: { x: number; y: number }) => {
-      if (state.interaction.kind === 'measure') {
-        state.setMeasureEdge(areaId, afterIndex);
-        return;
-      }
-      // Insert new point
+      // Double-tap on edge = insert new point
       state.insertAreaPoint(areaId, afterIndex, point);
+    },
+    [state],
+  );
+
+  const handleTapEdge = useCallback(
+    (areaId: UUID, edgeIndex: number) => {
+      // Single tap on edge = select it, show dimension
+      state.selectEdge(areaId, edgeIndex);
     },
     [state],
   );
@@ -226,14 +225,16 @@ export function GardenLayoutScreen() {
     );
   }
 
-  const isMeasuring = state.interaction.kind === 'measure';
-  const measureEdge =
-    isMeasuring && 'activeEdge' in state.interaction
-      ? state.interaction.activeEdge ?? null
+  // Selected edge (from any state that has selectedEdge)
+  const selectedEdge =
+    (state.interaction.kind === 'idle' ||
+      state.interaction.kind === 'area_selected') &&
+    state.interaction.selectedEdge
+      ? state.interaction.selectedEdge
       : null;
 
   return (
-    <main className="flex h-screen flex-col bg-surface">
+    <main className="flex h-[100dvh] flex-col overflow-hidden bg-surface">
       {/* Header */}
       <header className="flex items-center gap-3 bg-card px-4 py-3 shadow-sm">
         <NavLink
@@ -263,12 +264,13 @@ export function GardenLayoutScreen() {
           t('gardenLayout.hint.areaSelected')}
         {state.interaction.kind === 'point_selected' &&
           t('gardenLayout.hint.pointSelected')}
-        {state.interaction.kind === 'measure' &&
-          t('gardenLayout.hint.measure')}
+        {state.interaction.kind === 'idle' &&
+          state.interaction.selectedEdge &&
+          t('gardenLayout.hint.edgeSelected')}
       </div>
 
-      {/* Canvas */}
-      <div className="relative flex-1">
+      {/* Canvas (flex-1 + min-h-0 ensures it shrinks to fit between header and toolbar) */}
+      <div className="relative min-h-0 flex-1">
         <GardenCanvas
           layout={state.layout}
           plantSummaries={summaryMap}
@@ -276,6 +278,7 @@ export function GardenLayoutScreen() {
           onDblTapArea={handleDblTapArea}
           onDblTapHandle={handleDblTapHandle}
           onDblTapEdge={handleDblTapEdge}
+          onTapEdge={handleTapEdge}
           onDragPoint={handleDragPoint}
           onDragPointEnd={handleDragPointEnd}
           onPlantTap={handlePlantTap}
@@ -315,14 +318,12 @@ export function GardenLayoutScreen() {
         </div>
       )}
 
-      {/* Measure panel */}
-      {measureEdge && (
-        <MeasurePanel
-          edgeIndex={measureEdge.edgeIndex}
-          lengthCm={measureEdge.lengthCm}
-          onApply={state.applyEdgeLength}
-        />
-      )}
+      {/* Dimension field (always visible) */}
+      <MeasurePanel
+        edgeIndex={selectedEdge ? selectedEdge.edgeIndex : null}
+        lengthCm={selectedEdge ? selectedEdge.lengthCm : null}
+        onApply={state.applyEdgeLength}
+      />
 
       {/* Toolbar */}
       <div className="bg-card shadow-[0_-2px_8px_rgba(0,0,0,0.06)]">
@@ -335,7 +336,6 @@ export function GardenLayoutScreen() {
           onOpenPalette={() => setShowPalette(true)}
           onAddMarker={() => setShowMarkerPicker(true)}
           onOpenObjectList={() => setShowObjectList(true)}
-          onToggleMeasure={state.toggleMeasure}
           onDeleteSelected={handleDeleteSelected}
         />
       </div>

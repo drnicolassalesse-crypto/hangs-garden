@@ -12,11 +12,12 @@ import {
 interface AreaShapeProps {
   area: GardenArea;
   isSelected: boolean;
-  selectedPointIndex: number | null; // which handle is active (-1 = none)
-  isMeasuring: boolean;
+  selectedPointIndex: number | null;
+  selectedEdgeIndex: number | null;
   onDblTapArea: () => void;
   onDblTapHandle: (index: number) => void;
   onDblTapEdge: (afterIndex: number, gridPoint: LayoutPoint) => void;
+  onTapEdge: (edgeIndex: number) => void;
   onDragPoint: (index: number, point: LayoutPoint) => void;
   onDragPointEnd: (index: number, point: LayoutPoint) => void;
 }
@@ -28,10 +29,11 @@ export function AreaShape({
   area,
   isSelected,
   selectedPointIndex,
-  isMeasuring,
+  selectedEdgeIndex,
   onDblTapArea,
   onDblTapHandle,
   onDblTapEdge,
+  onTapEdge,
   onDragPoint,
   onDragPointEnd,
 }: AreaShapeProps) {
@@ -45,48 +47,75 @@ export function AreaShape({
       ? `${area.width_cm} \u00D7 ${area.height_cm} cm`
       : '';
 
-  // Double-tap on polygon body or edge
+  // Find which edge the pointer is closest to
+  const findNearestEdge = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
+    const stage = e.target.getStage();
+    if (!stage) return null;
+    const pointer = stage.getPointerPosition();
+    if (!pointer) return null;
+    const group = e.target.getParent();
+    if (!group) return null;
+    const transform = group.getAbsoluteTransform().copy().invert();
+    const local = transform.point(pointer);
+
+    const pts = area.points;
+    let bestIdx = -1;
+    let bestDist = Infinity;
+    let bestGridPoint: LayoutPoint | null = null;
+
+    for (let i = 0; i < pts.length; i++) {
+      const a = pts[i];
+      const b = pts[(i + 1) % pts.length];
+      // Distance from local to the segment
+      const dx = b.x - a.x, dy = b.y - a.y;
+      const lenSq = dx * dx + dy * dy;
+      if (lenSq === 0) continue;
+      const t = Math.max(0, Math.min(1, ((local.x - a.x) * dx + (local.y - a.y) * dy) / lenSq));
+      const px = a.x + t * dx, py = a.y + t * dy;
+      const d = (local.x - px) ** 2 + (local.y - py) ** 2;
+      if (d < bestDist) {
+        bestDist = d;
+        bestIdx = i;
+      }
+      // Also find grid point for insert
+      const gp = findGridPointOnSegment(a, b, GRID_SIZE * 2);
+      if (gp && i === bestIdx) bestGridPoint = gp;
+    }
+    // Recompute grid point for the best edge
+    if (bestIdx >= 0 && !bestGridPoint) {
+      const a = pts[bestIdx];
+      const b = pts[(bestIdx + 1) % pts.length];
+      bestGridPoint = findGridPointOnSegment(a, b, GRID_SIZE * 2);
+    }
+    return { edgeIndex: bestIdx, gridPoint: bestGridPoint };
+  };
+
+  // Single tap on polygon = select edge (show dimension)
+  const handleTap = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
+    e.cancelBubble = true;
+    if (!isSelected) {
+      // Not selected yet — don't handle single tap on edge, let dblTap handle area selection
+      return;
+    }
+    const result = findNearestEdge(e);
+    if (result && result.edgeIndex >= 0) {
+      onTapEdge(result.edgeIndex);
+    }
+  };
+
+  // Double-tap on polygon = insert point on edge OR select area
   const handleDblTap = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
     e.cancelBubble = true;
 
-    if (isSelected && (isMeasuring || !isMeasuring)) {
-      // If measuring or area already selected: check if tapping near an edge
-      const stage = e.target.getStage();
-      if (!stage) return;
-      const pointer = stage.getPointerPosition();
-      if (!pointer) return;
-      const group = e.target.getParent();
-      if (!group) return;
-      const transform = group.getAbsoluteTransform().copy().invert();
-      const local = transform.point(pointer);
-
-      // Find closest edge with a grid point
-      const pts = area.points;
-      let bestIdx = -1;
-      let bestPoint: LayoutPoint | null = null;
-      let bestDist = Infinity;
-
-      for (let i = 0; i < pts.length; i++) {
-        const a = pts[i];
-        const b = pts[(i + 1) % pts.length];
-        const gp = findGridPointOnSegment(a, b, GRID_SIZE * 2);
-        if (gp) {
-          const d = (gp.x - local.x) ** 2 + (gp.y - local.y) ** 2;
-          if (d < bestDist) {
-            bestDist = d;
-            bestIdx = i;
-            bestPoint = gp;
-          }
-        }
-      }
-
-      if (bestPoint && bestIdx >= 0 && bestDist < (GRID_SIZE * 3) ** 2) {
-        onDblTapEdge(bestIdx, bestPoint);
+    if (isSelected) {
+      // Insert point on nearest edge
+      const result = findNearestEdge(e);
+      if (result && result.edgeIndex >= 0 && result.gridPoint) {
+        onDblTapEdge(result.edgeIndex, result.gridPoint);
         return;
       }
     }
-
-    // Otherwise: select/deselect area
+    // Select/deselect area
     onDblTapArea();
   };
 
@@ -100,9 +129,27 @@ export function AreaShape({
         stroke={area.fill_color}
         strokeWidth={isSelected ? 3 : 2}
         hitStrokeWidth={24}
+        onClick={handleTap}
+        onTap={handleTap}
         onDblClick={handleDblTap}
         onDblTap={handleDblTap}
       />
+
+      {/* Highlighted selected edge */}
+      {isSelected && selectedEdgeIndex !== null && (() => {
+        const p1 = area.points[selectedEdgeIndex];
+        const p2 = area.points[(selectedEdgeIndex + 1) % area.points.length];
+        if (!p1 || !p2) return null;
+        return (
+          <Line
+            points={[p1.x, p1.y, p2.x, p2.y]}
+            stroke="#2D6A4F"
+            strokeWidth={4}
+            dash={[8, 4]}
+            listening={false}
+          />
+        );
+      })()}
 
       {/* Label */}
       {area.label ? (
@@ -212,9 +259,8 @@ export function AreaShape({
           );
         })}
 
-      {/* Midpoint indicators on edges (when selected, not in measure) */}
+      {/* Midpoint indicators on edges (when selected) */}
       {isSelected &&
-        !isMeasuring &&
         area.points.map((pt, idx) => {
           const next = area.points[(idx + 1) % area.points.length];
           return (
@@ -226,34 +272,6 @@ export function AreaShape({
               fill={area.fill_color + '60'}
               stroke={area.fill_color}
               strokeWidth={1}
-              listening={false}
-            />
-          );
-        })}
-
-      {/* Edge length labels (when measuring and area selected) */}
-      {isSelected &&
-        isMeasuring &&
-        area.points.map((pt, idx) => {
-          const next = area.points[(idx + 1) % area.points.length];
-          const mx = (pt.x + next.x) / 2;
-          const my = (pt.y + next.y) / 2;
-          const dx = next.x - pt.x;
-          const dy = next.y - pt.y;
-          const len = Math.sqrt(dx * dx + dy * dy);
-          const cm = Math.round(len / 2); // PX_PER_CM = 2
-          return (
-            <Text
-              key={`len-${idx}`}
-              x={mx - 20}
-              y={my - 14}
-              width={40}
-              text={`${cm}`}
-              fontSize={10}
-              fontFamily="Inter, system-ui, sans-serif"
-              fill="#2D6A4F"
-              fontStyle="bold"
-              align="center"
               listening={false}
             />
           );

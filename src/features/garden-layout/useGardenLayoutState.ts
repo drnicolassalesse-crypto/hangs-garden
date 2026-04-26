@@ -31,22 +31,20 @@ import { saveLayout } from './actions';
 
 // ── Interaction state machine ────────────────────────────
 
+export interface SelectedEdge {
+  areaId: UUID;
+  edgeIndex: number;
+  lengthCm: number;
+}
+
 export type InteractionState =
-  | { kind: 'idle' }
-  | { kind: 'area_selected'; areaId: UUID }
+  | { kind: 'idle'; selectedEdge?: SelectedEdge }
+  | { kind: 'area_selected'; areaId: UUID; selectedEdge?: SelectedEdge }
   | {
       kind: 'point_selected';
       areaId: UUID;
       pointIndex: number;
       originalPoint: LayoutPoint;
-    }
-  | {
-      kind: 'measure';
-      activeEdge?: {
-        areaId: UUID;
-        edgeIndex: number;
-        lengthCm: number;
-      };
     };
 
 // ── Hook ─────────────────────────────────────────────────
@@ -128,19 +126,11 @@ export function useGardenLayoutState(
   // ── Interaction state transitions ─────────────────────
 
   const deselect = useCallback(() => {
-    setInteraction((cur) => {
-      if (cur.kind === 'measure') return { kind: 'measure' }; // stay in measure but clear edge
-      return { kind: 'idle' };
-    });
+    setInteraction({ kind: 'idle' });
   }, []);
 
   const selectArea = useCallback((areaId: UUID) => {
-    setInteraction((cur) => {
-      if (cur.kind === 'measure') {
-        return { kind: 'measure' }; // in measure mode, selecting area shows edges
-      }
-      return { kind: 'area_selected', areaId };
-    });
+    setInteraction({ kind: 'area_selected', areaId });
   }, []);
 
   const selectPoint = useCallback(
@@ -167,14 +157,7 @@ export function useGardenLayoutState(
     });
   }, []);
 
-  const toggleMeasure = useCallback(() => {
-    setInteraction((cur) => {
-      if (cur.kind === 'measure') return { kind: 'idle' };
-      return { kind: 'measure' };
-    });
-  }, []);
-
-  const setMeasureEdge = useCallback(
+  const selectEdge = useCallback(
     (areaId: UUID, edgeIndex: number) => {
       const area = layout.areas.find((a) => a.id === areaId);
       if (!area) return;
@@ -182,17 +165,27 @@ export function useGardenLayoutState(
       const p2 = area.points[(edgeIndex + 1) % area.points.length];
       const dx = p2.x - p1.x;
       const dy = p2.y - p1.y;
-      const lengthPx = Math.sqrt(dx * dx + dy * dy);
-      const lengthCm = Math.round((lengthPx / PX_PER_CM) * 10) / 10;
-      setInteraction({ kind: 'measure', activeEdge: { areaId, edgeIndex, lengthCm } });
+      const lengthCm = Math.round((Math.sqrt(dx * dx + dy * dy) / PX_PER_CM) * 10) / 10;
+      const edge: SelectedEdge = { areaId, edgeIndex, lengthCm };
+      setInteraction((cur) => {
+        if (cur.kind === 'area_selected') {
+          return { ...cur, selectedEdge: edge };
+        }
+        return { kind: 'area_selected', areaId, selectedEdge: edge };
+      });
     },
     [layout],
   );
 
   const applyEdgeLength = useCallback(
     (newLengthCm: number) => {
-      if (interaction.kind !== 'measure' || !interaction.activeEdge) return;
-      const { areaId, edgeIndex } = interaction.activeEdge;
+      const cur = interaction;
+      const edge =
+        (cur.kind === 'idle' || cur.kind === 'area_selected') && cur.selectedEdge
+          ? cur.selectedEdge
+          : null;
+      if (!edge) return;
+      const { areaId, edgeIndex } = edge;
       const area = layout.areas.find((a) => a.id === areaId);
       if (!area) return;
 
@@ -212,10 +205,11 @@ export function useGardenLayoutState(
       });
 
       update(updateAreaPoint(layout, areaId, p2Idx, newP2));
-      // Update the displayed measurement
-      setInteraction({
-        kind: 'measure',
-        activeEdge: { areaId, edgeIndex, lengthCm: newLengthCm },
+      // Update the selected edge with new length
+      const newEdge: SelectedEdge = { areaId, edgeIndex, lengthCm: newLengthCm };
+      setInteraction((c) => {
+        if (c.kind === 'area_selected') return { ...c, selectedEdge: newEdge };
+        return { kind: 'idle', selectedEdge: newEdge };
       });
     },
     [interaction, layout, update],
@@ -361,8 +355,7 @@ export function useGardenLayoutState(
     selectArea,
     selectPoint,
     fixPoint,
-    toggleMeasure,
-    setMeasureEdge,
+    selectEdge,
     applyEdgeLength,
     setPendingPlantId,
     // Areas

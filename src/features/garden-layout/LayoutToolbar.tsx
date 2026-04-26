@@ -10,7 +10,6 @@ interface LayoutToolbarProps {
   onOpenPalette: () => void;
   onAddMarker: () => void;
   onOpenObjectList: () => void;
-  onToggleMeasure: () => void;
   onDeleteSelected: () => void;
 }
 
@@ -23,13 +22,11 @@ export function LayoutToolbar({
   onOpenPalette,
   onAddMarker,
   onOpenObjectList,
-  onToggleMeasure,
   onDeleteSelected,
 }: LayoutToolbarProps) {
   const hasSelection =
     interaction.kind === 'area_selected' ||
     interaction.kind === 'point_selected';
-  const isMeasuring = interaction.kind === 'measure';
 
   return (
     <div className="flex items-center gap-1.5 overflow-x-auto px-3 py-2.5">
@@ -56,13 +53,6 @@ export function LayoutToolbar({
       <ToolBtn
         onClick={onOpenObjectList}
         label={t('gardenLayout.toolbar.objectList')}
-      />
-
-      {/* Dimension mode */}
-      <ToolBtn
-        onClick={onToggleMeasure}
-        label={t('gardenLayout.toolbar.dimension')}
-        active={isMeasuring}
       />
 
       {/* Delete (only when something selected) */}
