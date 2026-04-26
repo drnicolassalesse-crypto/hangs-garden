@@ -169,18 +169,24 @@ export function SettingsScreen() {
         <h2 className="mb-3 font-display text-sm font-semibold uppercase tracking-wide text-ink-muted">
           {t('settings.language.heading')}
         </h2>
-        <div className="flex gap-2">
-          {(['vi', 'en'] as Locale[]).map((l) => (
+        <div className="flex flex-wrap gap-2">
+          {([
+            ['vi', 'Tiếng Việt'],
+            ['en', 'English'],
+            ['th', 'ไทย'],
+            ['fr', 'Français'],
+            ['es', 'Español'],
+          ] as [Locale, string][]).map(([l, label]) => (
             <button
               key={l}
               onClick={() => setLocale(l)}
-              className={`flex-1 rounded-full border px-4 py-2 text-sm font-medium transition ${
+              className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
                 locale === l
                   ? 'border-primary bg-primary text-white'
                   : 'border-black/10 bg-card text-ink'
               }`}
             >
-              {l === 'vi' ? 'Tiếng Việt' : 'English'}
+              {label}
             </button>
           ))}
         </div>

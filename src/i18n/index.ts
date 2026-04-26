@@ -1,11 +1,16 @@
 import { useSyncExternalStore } from 'react';
 import en from './en';
 import vi from './vi';
+import th from './th';
+import fr from './fr';
+import es from './es';
 
-export type Locale = 'en' | 'vi';
+export type Locale = 'en' | 'vi' | 'th' | 'fr' | 'es';
 type Translations = Record<string, string>;
 
-const dictionaries: Record<Locale, Translations> = { en, vi };
+const dictionaries: Record<Locale, Translations> = { en, vi, th, fr, es };
+
+const SUPPORTED_LOCALES: Locale[] = ['en', 'vi', 'th', 'fr', 'es'];
 
 const STORAGE_KEY = 'planta.lang';
 const DEFAULT_LOCALE: Locale = 'vi';
@@ -16,7 +21,7 @@ const listeners = new Set<() => void>();
 function readLocale(): Locale {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === 'en' || stored === 'vi') return stored;
+    if (SUPPORTED_LOCALES.includes(stored as Locale)) return stored as Locale;
   } catch { /* SSR / test fallback */ }
   return DEFAULT_LOCALE;
 }
@@ -56,6 +61,7 @@ export function tp(
   count: number,
   params?: Record<string, string | number>,
 ): string {
-  const suffix = count === 1 && currentLocale === 'en' ? '_one' : '_other';
+  const useSingular = count === 1 && (currentLocale === 'en' || currentLocale === 'fr' || currentLocale === 'es');
+  const suffix = useSingular ? '_one' : '_other';
   return t(`${baseKey}${suffix}`, { count, ...params });
 }
