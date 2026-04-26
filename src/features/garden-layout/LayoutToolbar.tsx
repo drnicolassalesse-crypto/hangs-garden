@@ -10,6 +10,7 @@ interface LayoutToolbarProps {
   onOpenPalette: () => void;
   onAddMarker: () => void;
   onOpenObjectList: () => void;
+  onCenter: () => void;
   onDeleteSelected: () => void;
 }
 
@@ -22,6 +23,7 @@ export function LayoutToolbar({
   onOpenPalette,
   onAddMarker,
   onOpenObjectList,
+  onCenter,
   onDeleteSelected,
 }: LayoutToolbarProps) {
   const hasSelection =
@@ -53,6 +55,12 @@ export function LayoutToolbar({
       <ToolBtn
         onClick={onOpenObjectList}
         label={t('gardenLayout.toolbar.objectList')}
+      />
+
+      {/* Center */}
+      <ToolBtn
+        onClick={onCenter}
+        label={t('gardenLayout.toolbar.center')}
       />
 
       {/* Delete (only when something selected) */}

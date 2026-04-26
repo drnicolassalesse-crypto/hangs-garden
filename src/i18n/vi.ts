@@ -486,6 +486,7 @@ const vi: Record<string, string> = {
   'gardenLayout.toolbar.placePlants': 'C\u00E2y',
   'gardenLayout.toolbar.addMarker': '+ \u0110\u00E1nh d\u1EA5u',
   'gardenLayout.toolbar.objectList': 'Danh s\u00E1ch',
+  'gardenLayout.toolbar.center': 'Gi\u1EEFa',
   'gardenLayout.toolbar.dimension': '\u0110o',
 
   // Interaction hints

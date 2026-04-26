@@ -11,7 +11,7 @@ import { cleanupDeletedPots, emptyLayout } from '../../domain/gardenLayout';
 import type { Site, UUID } from '../../domain/types';
 import { t } from '../../i18n';
 import { useGardenLayoutState } from './useGardenLayoutState';
-import { GardenCanvas } from './GardenCanvas';
+import { GardenCanvas, type GardenCanvasHandle } from './GardenCanvas';
 import { LayoutToolbar } from './LayoutToolbar';
 import { MeasurePanel } from './MeasurePanel';
 import { AreaShapePicker } from './AreaShapePicker';
@@ -28,6 +28,7 @@ export function GardenLayoutScreen() {
   const [summaries, setSummaries] = useState<PlantSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const didAutoOpen = useRef(false);
+  const canvasRef = useRef<GardenCanvasHandle>(null);
 
   // Load site and plant data
   const load = useCallback(async () => {
@@ -272,6 +273,7 @@ export function GardenLayoutScreen() {
       {/* Canvas (flex-1 + min-h-0 ensures it shrinks to fit between header and toolbar) */}
       <div className="relative min-h-0 flex-1">
         <GardenCanvas
+          ref={canvasRef}
           layout={state.layout}
           plantSummaries={summaryMap}
           interaction={state.interaction}
@@ -336,6 +338,7 @@ export function GardenLayoutScreen() {
           onOpenPalette={() => setShowPalette(true)}
           onAddMarker={() => setShowMarkerPicker(true)}
           onOpenObjectList={() => setShowObjectList(true)}
+          onCenter={() => canvasRef.current?.centerView()}
           onDeleteSelected={handleDeleteSelected}
         />
       </div>

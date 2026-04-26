@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import { Stage, Layer, Line } from 'react-konva';
 import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
@@ -8,6 +15,10 @@ import type { InteractionState } from './useGardenLayoutState';
 import { AreaShape } from './AreaShape';
 import { PlantIcon } from './PlantIcon';
 import { MarkerIcon } from './MarkerIcon';
+
+export interface GardenCanvasHandle {
+  centerView: () => void;
+}
 
 interface GardenCanvasProps {
   layout: GardenLayout;
@@ -43,20 +54,24 @@ function getMidpoint(p1: Touch, p2: Touch) {
   };
 }
 
-export function GardenCanvas({
-  layout,
-  plantSummaries,
-  interaction,
-  onDblTapArea,
-  onDblTapHandle,
-  onDblTapEdge,
-  onTapEdge,
-  onDragPoint,
-  onDragPointEnd,
-  onPlantTap,
-  onCanvasTap,
-  onDblTapEmpty,
-}: GardenCanvasProps) {
+export const GardenCanvas = forwardRef<GardenCanvasHandle, GardenCanvasProps>(
+  function GardenCanvas(
+    {
+      layout,
+      plantSummaries,
+      interaction,
+      onDblTapArea,
+      onDblTapHandle,
+      onDblTapEdge,
+      onTapEdge,
+      onDragPoint,
+      onDragPointEnd,
+      onPlantTap,
+      onCanvasTap,
+      onDblTapEmpty,
+    },
+    ref,
+  ) {
   const containerRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<Konva.Stage>(null);
   const [size, setSize] = useState({ width: 400, height: 400 });
@@ -164,13 +179,66 @@ export function GardenCanvas({
     stage.batchDraw();
   }, []);
 
-  // Grid lines
+  // Center view: fit all areas into the viewport with padding
+  const centerView = useCallback(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    if (layout.areas.length === 0) {
+      stage.scale({ x: 1, y: 1 });
+      stage.position({ x: 0, y: 0 });
+      stage.batchDraw();
+      return;
+    }
+    // Compute bounding box of all visible areas
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const area of layout.areas) {
+      if (area.visible === false) continue;
+      for (const pt of area.points) {
+        const ax = area.x + pt.x;
+        const ay = area.y + pt.y;
+        if (ax < minX) minX = ax;
+        if (ay < minY) minY = ay;
+        if (ax > maxX) maxX = ax;
+        if (ay > maxY) maxY = ay;
+      }
+    }
+    if (!isFinite(minX)) return;
+    const padding = 40;
+    const bboxW = maxX - minX + padding * 2;
+    const bboxH = maxY - minY + padding * 2;
+    const scaleX = size.width / bboxW;
+    const scaleY = size.height / bboxH;
+    const scale = Math.min(scaleX, scaleY, MAX_SCALE);
+    const clamped = Math.max(MIN_SCALE, scale);
+    stage.scale({ x: clamped, y: clamped });
+    const cx = (minX + maxX) / 2;
+    const cy = (minY + maxY) / 2;
+    stage.position({
+      x: size.width / 2 - cx * clamped,
+      y: size.height / 2 - cy * clamped,
+    });
+    stage.batchDraw();
+  }, [layout.areas, size]);
+
+  useImperativeHandle(ref, () => ({ centerView }), [centerView]);
+
+  // Auto-center on first render when areas exist
+  const didCenter = useRef(false);
+  useEffect(() => {
+    if (!didCenter.current && layout.areas.length > 0 && size.width > 100) {
+      didCenter.current = true;
+      centerView();
+    }
+  }, [layout.areas.length, size, centerView]);
+
+  // Grid: extend to cover a large area so it always fills the viewport
+  const GRID_EXTENT = 2000;
   const gridLines: { points: number[]; key: string }[] = [];
-  for (let x = 0; x <= layout.canvas_width; x += GRID_SIZE) {
-    gridLines.push({ points: [x, 0, x, layout.canvas_height], key: `gv-${x}` });
+  for (let x = -GRID_EXTENT; x <= GRID_EXTENT; x += GRID_SIZE) {
+    gridLines.push({ points: [x, -GRID_EXTENT, x, GRID_EXTENT], key: `gv-${x}` });
   }
-  for (let y = 0; y <= layout.canvas_height; y += GRID_SIZE) {
-    gridLines.push({ points: [0, y, layout.canvas_width, y], key: `gh-${y}` });
+  for (let y = -GRID_EXTENT; y <= GRID_EXTENT; y += GRID_SIZE) {
+    gridLines.push({ points: [-GRID_EXTENT, y, GRID_EXTENT, y], key: `gh-${y}` });
   }
 
   // Derive per-area state from interaction
@@ -273,4 +341,5 @@ export function GardenCanvas({
       </Stage>
     </div>
   );
-}
+},
+);

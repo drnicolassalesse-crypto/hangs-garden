@@ -486,6 +486,7 @@ const en: Record<string, string> = {
   'gardenLayout.toolbar.placePlants': 'Plants',
   'gardenLayout.toolbar.addMarker': '+ Marker',
   'gardenLayout.toolbar.objectList': 'List',
+  'gardenLayout.toolbar.center': 'Center',
   'gardenLayout.toolbar.dimension': 'Measure',
 
   // Interaction hints
